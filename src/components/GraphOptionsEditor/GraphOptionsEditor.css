@@ -1,0 +1,14 @@
+.GraphViewOptions-wrapper {
+  padding: 1em;
+  background-color: #eeeeee;
+}
+
+.GraphViewOptions-label {
+  display: flex;
+  align-items: baseline;
+}
+.GraphViewOptions-label > input[type="checkbox"] {
+  margin-right: 0.5em;
+  position: relative;
+  top: 3px;
+}

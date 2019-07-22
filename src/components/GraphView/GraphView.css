@@ -1,0 +1,37 @@
+.GraphView-host {
+  position: relative;
+  flex-grow: 1;
+}
+
+.GraphView-pending,
+.GraphView-initial-load,
+.Graphview-over-limit,
+.GraphView-empty,
+.GraphView-error {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.Graphview-show-anyway-button {
+  outline: none;
+  border-radius: 0;
+  border: 1px solid #0000ff;
+  color: #0000ff;
+  padding: 1em;
+  background: transparent;
+  margin-top: 1em;
+}
+
+.Graphview-show-anyway-button:hover {
+  background-color: #0000ff;
+  color: #ffffff;
+  border-color: #ffffff;
+}

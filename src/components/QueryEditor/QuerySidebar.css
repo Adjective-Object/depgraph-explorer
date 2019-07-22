@@ -1,0 +1,9 @@
+.QuerySidebar-host {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  width: 400px;
+  border-left: 2px solid black;
+  overflow-y: auto;
+  flex-shrink: 1;
+}

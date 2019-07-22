@@ -1,0 +1,30 @@
+.BundleSizeSummary-container {
+  position: relative;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 1em;
+  overflow-y: auto;
+
+  border-right: 2px solid black;
+  max-width: 30vw;
+}
+
+.BundleSizeSummary-container:hover {
+  background-color: white;
+}
+
+.BundleSizeSummary-table {
+  border-collapse: collapse;
+}
+
+.BundleSizeSummary-table td {
+  padding: 4px;
+}
+
+.BundleSizeSummary-titleRow {
+  font-weight: bold;
+}
+
+.BundleSizeSummary-totalsRow {
+  border-bottom: 1px solid black;
+}

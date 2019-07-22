@@ -1,5 +1,12 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Setup
+
+1. run webpack in your repo on master to generate a `bundlestats.json`. Save to `example-data/bundlestats-baseline.json`
+2. Do the same on a branch with some changes and save to `example-data/bundlestats-baseline.json`
+3. run `./scripts/bootstrap-dev-data.js`
+4. `yarn start`
+
 ## Available Scripts
 
 In the project directory, you can run:

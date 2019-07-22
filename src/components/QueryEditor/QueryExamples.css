@@ -1,0 +1,30 @@
+.QueryExamples-wrapper,
+.QueryExamples-header,
+.QueryExamples-example,
+.QueryExamples-helptext {
+  padding: 0.5em;
+}
+
+.QueryExamples-header {
+  cursor: pointer;
+}
+.QueryExamples-header:hover {
+  color: #0000ff;
+}
+
+.QueryExamples-helptext {
+  font-size: 1.2em;
+  font-style: italic;
+  background-color: #eeeeee;
+}
+
+.QueryExamples-example {
+  list-style: none;
+}
+
+.QueryExamples-example:hover {
+  background-color: #0000ff;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+}
