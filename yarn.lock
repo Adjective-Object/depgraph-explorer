@@ -9743,10 +9743,10 @@ webidl-conversions@^4.0.2:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-4.0.2.tgz#a855980b1f0b6b359ba1d5d9fb39ae941faa63ad"
   integrity sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==
 
-webpack-bundle-diff-add-children@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/webpack-bundle-diff-add-children/-/webpack-bundle-diff-add-children-0.0.3.tgz#19d303c54ac53566c4a10d824c4a4e59252e9837"
-  integrity sha512-0ATAN+208m8n3viMM/3yx3eXswGbVGnh8Skc/+hXM6JPcq1EvC22j6VR//pqzICKE6r7QvtX9bMannLthDFM5A==
+webpack-bundle-diff-add-children@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-diff-add-children/-/webpack-bundle-diff-add-children-0.1.0.tgz#1004d8a236e6665bb06f6bd4dfbcec8d96a05f76"
+  integrity sha512-bG16BVOcbrgHI1hdSovFGaFaYFXedRzwAPpWGoWd9tnK1dqJQ41HHvVxoRHuyDPAlDMttAJTsLiC0eamGieuyg==
   dependencies:
     webpack-bundle-diff "^0.5.0"
 

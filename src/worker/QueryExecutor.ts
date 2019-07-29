@@ -76,7 +76,7 @@ const applyQuery = (
         query.target
       );
       return traverseGraph(innerIncludeQueryResults, node =>
-        node.parents.map(parentNodeName => graph[parentNodeName])
+        node.dependants.map(parentNodeName => graph[parentNodeName])
       );
     case "INCLUDEDBY":
       const innerIncludedByQueryResults = applyQuery(
@@ -85,7 +85,7 @@ const applyQuery = (
         query.target
       );
       return traverseGraph(innerIncludedByQueryResults, node =>
-        node.children.map(childNodeName => graph[childNodeName])
+        node.dependencies.map(childNodeName => graph[childNodeName])
       );
     case "AND":
       const andLeftNames = applyQuery(bothGraphs, graph, query.left).map(
@@ -153,7 +153,7 @@ const applyQuery = (
         for (let node of queryToInterpolateResults) {
           console.log("traverse from", node.name);
           traverseGraph([node], node =>
-            node.parents
+            node.dependants
               .map(parentNodeName => graph[parentNodeName])
               .filter(
                 node =>
@@ -177,7 +177,7 @@ const applyQuery = (
           const descendantsInUnion = traverseGraph(
             [startingNode],
             currentChildNode =>
-              currentChildNode.children
+              currentChildNode.dependencies
                 .filter(childName => unionOfAllParents.has(childName))
                 .filter(childName => {
                   const inParentSetsOf = parentsToOriginalNode.get(childName);

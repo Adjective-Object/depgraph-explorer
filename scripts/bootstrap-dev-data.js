@@ -29,7 +29,7 @@ const outFilePath = path.join(distDir, "stats.json");
 const fileContent = JSON.stringify({
   baselineGraph,
   pullRequestGraph
-});
+}, null, 2);
 
 if (!fs.existsSync(distDir)) {
   console.log("making directory", distDir);

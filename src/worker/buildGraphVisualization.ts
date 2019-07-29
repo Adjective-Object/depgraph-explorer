@@ -7,8 +7,8 @@ import { ModuleGraphNodeWithChildren } from "webpack-bundle-diff-add-children";
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../utils/colors";
 
-const getChildren = (maybeNode: ModuleGraphNodeWithChildren | undefined) =>
-  maybeNode ? maybeNode.children || [] : [];
+const getDependencies = (maybeNode: ModuleGraphNodeWithChildren | undefined) =>
+  maybeNode ? maybeNode.dependencies || [] : [];
 
 const getNodeId = (
   oldGraphNode: ModuleGraphNodeWithChildren | undefined,
@@ -182,21 +182,21 @@ export function buildGraphVisualization(
 
     nodes.push(node);
 
-    const allChildren = uniq(
-      getChildren(oldGraphNode).concat(getChildren(newGraphNode))
+    const allDependencies = uniq(
+      getDependencies(oldGraphNode).concat(getDependencies(newGraphNode))
     );
 
-    allChildren.forEach(childName => {
-      const oldChildNode = filteredBundleStats.baselineGraph[childName];
-      const newChildNode = filteredBundleStats.pullRequestGraph[childName];
-      if (!newChildNode && !oldChildNode) {
+    allDependencies.forEach(dependencyName => {
+      const oldDependencyNode = filteredBundleStats.baselineGraph[dependencyName];
+      const newDependencyNode = filteredBundleStats.pullRequestGraph[dependencyName];
+      if (!newDependencyNode && !oldDependencyNode) {
         return;
       }
-      const childID = getNodeId(oldChildNode, newChildNode);
+      const dependencyId = getNodeId(oldDependencyNode, newDependencyNode);
 
       edges.push({
         from: nodeId,
-        to: childID
+        to: dependencyId
       });
     });
   }
