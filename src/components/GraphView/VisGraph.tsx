@@ -62,7 +62,10 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
         }
       },
       nodes: {
-        shape: "diamond"
+        shape: "box",
+        shapeProperties: {
+          borderRadius: 1
+        }
       },
       edges: {
         arrows: "to"

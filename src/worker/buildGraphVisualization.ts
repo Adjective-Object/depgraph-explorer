@@ -171,14 +171,12 @@ export function buildGraphVisualization(
         left: 10,
         right: 10
       },
-      shapeProperties: {
-        borderRadius: 1
-      },
       borderWidth: addedOrRemoved || isRootNode ? 2 : 1
     };
 
-    if (!isRootNode) {
-      (node as any).shape = "box";
+    if (isRootNode) {
+      (node as any).shape = "diamond";
+    } else {
       (node as any).font.color = isLight ? "#000" : "#FFF";
     }
 

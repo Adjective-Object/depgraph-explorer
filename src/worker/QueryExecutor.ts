@@ -56,39 +56,6 @@ function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
   return _intersection;
 }
 
-function addInterpolatedParentNodes(
-  encounteredYes: Set<string>,
-  encounteredNo: Set<string>,
-  graph: ModuleGraphWithChildren,
-  node: ModuleGraphNodeWithChildren
-): boolean {
-  if (node.parents.length == 0) {
-    return false;
-  }
-  if (encounteredYes.has(node.name)) {
-    return true;
-  }
-  if (encounteredNo.has(node.name)) {
-    return false;
-  }
-  console.log("addInterpolatedParentNodes..", node.name);
-  const parentResults = node.parents.map(parentName => {
-    const shouldAdd = addInterpolatedParentNodes(
-      encounteredYes,
-      encounteredNo,
-      graph,
-      graph[parentName]
-    );
-    if (shouldAdd) {
-      encounteredYes.add(parentName);
-    } else {
-      encounteredNo.add(parentName);
-    }
-    return shouldAdd;
-  });
-  return parentResults.some(Boolean);
-}
-
 const applyQuery = (
   bothGraphs: BothBundleStats,
   graph: ModuleGraphWithChildren,
@@ -177,24 +144,57 @@ const applyQuery = (
           graph,
           query.innerQuery
         );
+        const originalNodeNames = new Set(
+          queryToInterpolateResults.map(x => x.name)
+        );
         console.log("getting union of all parents");
         const unionOfAllParents = new Set<string>();
+        const parentsToOriginalNode = new Map<string, Set<string>>();
         for (let node of queryToInterpolateResults) {
           console.log("traverse from", node.name);
           traverseGraph([node], node =>
-            node.parents.map(parentNodeName => graph[parentNodeName])
-          ).forEach(parent => unionOfAllParents.add(parent.name));
+            node.parents
+              .map(parentNodeName => graph[parentNodeName])
+              .filter(
+                node =>
+                  // do not ascend through other nodes in the starting set
+                  !originalNodeNames.has(node.name)
+              )
+          ).forEach(parent => {
+            unionOfAllParents.add(parent.name);
+            if (!parentsToOriginalNode.has(parent.name)) {
+              parentsToOriginalNode.set(parent.name, new Set());
+            }
+            parentsToOriginalNode.get(parent.name)!.add(node.name);
+          });
         }
         console.log(unionOfAllParents);
 
         console.log("starting descendants of each node");
         const result = new Set<string>();
-        for (let node of queryToInterpolateResults) {
-          console.log("traverse from", node.name);
-          const descendantsInUnion = traverseGraph([node], node =>
-            node.children
-              .filter(childName => unionOfAllParents.has(childName))
-              .map(childNodeName => graph[childNodeName])
+        for (let startingNode of queryToInterpolateResults) {
+          console.log("traverse from", startingNode.name);
+          const descendantsInUnion = traverseGraph(
+            [startingNode],
+            currentChildNode =>
+              currentChildNode.children
+                .filter(childName => unionOfAllParents.has(childName))
+                .filter(childName => {
+                  const inParentSetsOf = parentsToOriginalNode.get(childName);
+                  return (
+                    // do not descend through other nodes in the starting set
+                    !originalNodeNames.has(childName) &&
+                    // If it was not seen in the parent pass, ignore it
+                    inParentSetsOf != null &&
+                    // Only include it in the graph if it is not a circular dependency.
+                    // e.g. its only parent set is the same node it is in the child set of
+                    !(
+                      inParentSetsOf.size == 1 &&
+                      inParentSetsOf.has(startingNode.name)
+                    )
+                  );
+                })
+                .map(childNodeName => graph[childNodeName])
           );
           descendantsInUnion.forEach(descendant => result.add(descendant.name));
         }
