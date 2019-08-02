@@ -103,10 +103,10 @@ const GraphView = () => {
           size={numNodes}
           showAnywayCallback={onShowAnyway}
         />
-      ) : numNodes === 0 ? (
-        <GraphViewEmpty />
       ) : isQueryError(queryResult) ? (
         <QueryErrorMessage message={queryResult.errorMessage} />
+      ) : numNodes === 0 ? (
+        <GraphViewEmpty />
       ) : (
         <VisGraph graphData={queryResult.data} />
       )}

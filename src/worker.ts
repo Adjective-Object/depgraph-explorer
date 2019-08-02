@@ -22,7 +22,10 @@ let isInitialized: boolean = false;
 const performQuery = (query: Query) => {
   try {
     const resultGraph = queryExecutor.filter(query);
-    const resultVisualizationData = buildGraphVisualization(resultGraph);
+    const resultVisualizationData = buildGraphVisualization(
+      resultGraph,
+      queryExecutor.getData()
+    );
     const response: PerformQueryResponseMessage = {
       type: "QUERY_RESULT",
       forQuery: query,

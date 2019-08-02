@@ -3,7 +3,10 @@ import { Palette } from "./Palette";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 import { default as Color } from "color";
 import { BothBundleStats } from "../reducers/schema";
-import { ModuleGraphNodeWithChildren } from "webpack-bundle-diff-add-children";
+import {
+  ModuleGraphNodeWithChildren,
+  ModuleGraphWithChildren
+} from "webpack-bundle-diff-add-children";
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../utils/colors";
 
@@ -96,7 +99,8 @@ const uniq = <T>(a: T[]) => {
 };
 
 export function buildGraphVisualization(
-  filteredBundleStats: BothBundleStats
+  filteredBundleStats: BothBundleStats,
+  fullBundleStats: BothBundleStats
 ): Vis.Data {
   const allNodeNames = uniq(
     Object.keys(filteredBundleStats.baselineGraph).concat(
@@ -126,6 +130,19 @@ export function buildGraphVisualization(
     } else if (isRemoved) {
       labelStub = "REMOVED";
       borderColor = GOOD_COLOR;
+    }
+
+    const wasHoisted = (
+      node: ModuleGraphNodeWithChildren,
+      graph: ModuleGraphWithChildren
+    ) =>
+      node.parents.length === 1 &&
+      graph[node.parents[0]].containsHoistedModules === true;
+    if (
+      wasHoisted(oldGraphNode, fullBundleStats.baselineGraph) ||
+      wasHoisted(newGraphNode, fullBundleStats.pullRequestGraph)
+    ) {
+      labelStub = "*HOISTED*" + (labelStub.length ? " " : "") + labelStub;
     }
 
     const isRootNode = (oldGraphNode || newGraphNode).parents.length == 0;
@@ -187,8 +204,10 @@ export function buildGraphVisualization(
     );
 
     allDependencies.forEach(dependencyName => {
-      const oldDependencyNode = filteredBundleStats.baselineGraph[dependencyName];
-      const newDependencyNode = filteredBundleStats.pullRequestGraph[dependencyName];
+      const oldDependencyNode =
+        filteredBundleStats.baselineGraph[dependencyName];
+      const newDependencyNode =
+        filteredBundleStats.pullRequestGraph[dependencyName];
       if (!newDependencyNode && !oldDependencyNode) {
         return;
       }

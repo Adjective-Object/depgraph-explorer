@@ -28,7 +28,8 @@ const tutorialExamples = [
   },
   {
     exampleName: "packages included by reading pane, tracing dependenices",
-    exampleBody: "interpolate( (included_by '*package1*') & '*lib/lazyIndex*'! )"
+    exampleBody:
+      "interpolate( (included_by '*package1*') & '*lib/lazyIndex*'! )"
   }
 ];
 

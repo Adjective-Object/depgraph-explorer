@@ -220,6 +220,13 @@ export class QueryExecutor {
     this.bundleData = blob;
   }
 
+  getData(): BothBundleStats {
+    if (!this.bundleData) {
+      throw Error("bundle data fetched before it was initialized");
+    }
+    return this.bundleData;
+  }
+
   filter(query: Query): BothBundleStats {
     if (this.bundleData === undefined) {
       throw new Error("query executed before bundle data initialized");
