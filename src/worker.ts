@@ -34,6 +34,7 @@ const performQuery = (query: Query) => {
     };
     return response;
   } catch (e) {
+    console.error(e.stack);
     const response: PerformQueryResponseErrorMessage = {
       type: "QUERY_ERROR",
       forQuery: query,

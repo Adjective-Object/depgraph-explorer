@@ -94,6 +94,17 @@ const palette = new Palette([
   "#000000"
 ]);
 
+const union = <T>(setA: Set<T>, setB: Set<T>): Set<T> => {
+  var _union = new Set<T>();
+  setA.forEach(elem => {
+    _union.add(elem);
+  });
+  setB.forEach(elem => {
+    _union.add(elem);
+  });
+  return _union;
+};
+
 const uniq = <T>(a: T[]) => {
   return Array.from(new Set(a));
 };
@@ -133,11 +144,13 @@ export function buildGraphVisualization(
     }
 
     const wasHoisted = (
-      node: ModuleGraphNodeWithChildren,
+      node: ModuleGraphNodeWithChildren | undefined,
       graph: ModuleGraphWithChildren
     ) =>
+      node &&
       node.parents.length === 1 &&
       graph[node.parents[0]].containsHoistedModules === true;
+
     if (
       wasHoisted(oldGraphNode, fullBundleStats.baselineGraph) ||
       wasHoisted(newGraphNode, fullBundleStats.pullRequestGraph)
@@ -199,8 +212,12 @@ export function buildGraphVisualization(
 
     nodes.push(node);
 
-    const allDependencies = uniq(
-      getDependencies(oldGraphNode).concat(getDependencies(newGraphNode))
+    const oldDependencies: Set<string> = new Set(getDependencies(oldGraphNode));
+    const newDependencies: Set<string> = new Set(getDependencies(newGraphNode));
+
+    const allDependencies: Set<string> = union(
+      oldDependencies,
+      newDependencies
     );
 
     allDependencies.forEach(dependencyName => {
@@ -212,10 +229,13 @@ export function buildGraphVisualization(
         return;
       }
       const dependencyId = getNodeId(oldDependencyNode, newDependencyNode);
+      const inNew = newDependencies.has(dependencyName);
+      const inOld = oldDependencies.has(dependencyName);
 
       edges.push({
         from: nodeId,
-        to: dependencyId
+        to: dependencyId,
+        color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR
       });
     });
   }
