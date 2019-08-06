@@ -74,6 +74,17 @@ export const BundleSizeSummaryTable = () => {
                 [, size2]: [string, SizeSummary]
               ) => {
                 return (
+                  Math.abs(size2.totalBytesAfter) -
+                  Math.abs(size1.totalBytesAfter)
+                );
+              }
+            )
+            .sort(
+              (
+                [, size1]: [string, SizeSummary],
+                [, size2]: [string, SizeSummary]
+              ) => {
+                return (
                   Math.abs(size2.totalBytesDelta) -
                   Math.abs(size1.totalBytesDelta)
                 );
