@@ -1,5 +1,9 @@
 export function getPackageFromFilePath(filePath: string): [string, string] {
   let match: RegExpExecArray | string[] | null;
+  // catch namespaced modules.
+  if ((match = /\/node_modules\/(\@[^\/]*\/[^\/]*)\/(.*)$/g.exec(filePath))) {
+    return [match[1], match[1] + "/" + match[2]];
+  }
   if (
     (match = /\/node_modules\/([^/]*)\/(.*)$/g.exec(filePath)) &&
     filePath.indexOf("css-loader") == -1
