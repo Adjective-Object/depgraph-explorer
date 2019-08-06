@@ -31,7 +31,7 @@ BundleQuery {
     | ("\\"" pathLiteralInternal "\\"" "!"? )
 
   pathLiteralInternal
-    = (alnum|"\\\\"|"/"|"."|":"|"*"|"-"|"_")*
+    = (" "|"@"|alnum|"\\\\"|"/"|"."|":"|"*"|"-"|"_")*
     
   specialCaseLiteral
     = "removed" | "added" | "changed"
