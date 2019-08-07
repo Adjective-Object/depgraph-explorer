@@ -48,7 +48,15 @@ ctx.onmessage = function(e: MessageEvent): void {
   const messageData = e.data as AppToWorkerMessage;
   console.log("Worker: Message received from app script", messageData);
   switch (messageData.type) {
-    case "INIT_STORE":
+    case "INIT_STORE_FROM_BUNDLE_STATS":
+      queryExecutor.setData(messageData.bundleData);
+      isInitialized = true;
+      const message: InitStoreResponseMessage = {
+        type: "STORE_LOADED"
+      };
+      ctx.postMessage(message);
+      break;
+    case "INIT_STORE_FROM_URL":
       fetch(messageData.payloadUrl)
         .then(r => r.json())
         .then(response => {

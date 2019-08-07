@@ -1,10 +1,15 @@
 import { Data as VisData } from "vis";
 import { Query } from "../utils/Query";
-import { BundleSizeSummary } from "../reducers/schema";
+import { BundleSizeSummary, BothBundleStats } from "../reducers/schema";
 
-export interface InitStoreRequestMessage {
-  type: "INIT_STORE";
+export interface InitStoreFromUrlRequestMessage {
+  type: "INIT_STORE_FROM_URL";
   payloadUrl: string;
+}
+
+export interface InitStoreFromBundleRequestMessage {
+  type: "INIT_STORE_FROM_BUNDLE_STATS";
+  bundleData: BothBundleStats;
 }
 
 export interface PerformQueryRequestMessage {
@@ -35,7 +40,8 @@ export interface PerformQueryResponseErrorMessage {
 }
 
 export type AppToWorkerMessage =
-  | InitStoreRequestMessage
+  | InitStoreFromUrlRequestMessage
+  | InitStoreFromBundleRequestMessage
   | PerformQueryRequestMessage;
 
 export type WorkerToAppMessage =

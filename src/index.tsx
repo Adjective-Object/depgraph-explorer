@@ -5,7 +5,10 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 
 import App from "./App";
-import { InitStoreRequestMessage, WorkerToAppMessage } from "./worker/messages";
+import {
+  InitStoreFromUrlRequestMessage,
+  WorkerToAppMessage
+} from "./worker/messages";
 import { markBundleDataInitialized } from "./actions/markBundleDataInitialized";
 import { setQueryResult } from "./actions/setQueryResult";
 import { setFilterText } from "./actions/setFilterText";
@@ -18,7 +21,9 @@ import { setAppUIState } from "./actions/setAppUIState";
 import "./observer/postToWorkerDebouncedOnQueryChange";
 import "./observer/setQueryParametersOnStateChange";
 import { setBundleSource } from "./actions/setBundleSource";
+import { setTutorials } from "./actions/setTutorials";
 import { markBundleDataLoadError } from "./actions/markBundleDataLoadError";
+import { defaultTutorials } from "./defaultTutorials";
 
 //////////////////////
 // Spawn the worker //
@@ -65,12 +70,17 @@ setAppUIState({
   isRightSidebarOpen: !urlParams.has("rc")
 });
 const bundleDataSource: string = urlParams.get("bundle") || "./stats.json";
-const initStoreMessage: InitStoreRequestMessage = {
-  type: "INIT_STORE",
+const initStoreMessage: InitStoreFromUrlRequestMessage = {
+  type: "INIT_STORE_FROM_URL",
   payloadUrl: bundleDataSource
 };
 setBundleSource(bundleDataSource);
 appWorker.postMessage(initStoreMessage);
+// fetch the tutorial
+fetch("./tutorial_examples.json")
+  .then(r => r.json())
+  .then(tutorials => setTutorials(tutorials))
+  .catch(e => setTutorials(defaultTutorials));
 
 ///////////////////
 // Mount the app //

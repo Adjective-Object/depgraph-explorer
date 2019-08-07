@@ -61,6 +61,7 @@ export interface RootStore {
   query: QueryState;
   graphOptions: GraphViewOptions;
   appUIState: AppUIState;
+  tutorials: Tutorial[];
 }
 
 export type SetFilterTextAction = {
@@ -102,6 +103,16 @@ export type BundleDataAction =
   | MarkBundleDataLoadErrorAction
   | SetBundleDataSourceAction;
 
+export interface Tutorial {
+  exampleName: string;
+  exampleBody: string;
+}
+export interface SetTutorialsAction {
+  type: "SET_TUTORIALS";
+  newTutorials: Tutorial[];
+}
+export type TutorialAction = SetTutorialsAction;
+
 export interface GraphViewOptions {
   isHierarchical: boolean;
   shouldStabilize: boolean;
@@ -136,4 +147,5 @@ export type AppAction =
   | BundleDataAction
   | QueryAction
   | GraphOptionsActions
-  | AppUIActions;
+  | AppUIActions
+  | TutorialAction;
