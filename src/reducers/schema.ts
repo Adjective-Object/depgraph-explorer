@@ -14,9 +14,16 @@ export interface BothBundleStats {
 export interface BundleDataState {
   initializationState:
     | { type: "UNINITIALIZED" }
+    | { type: "INITIALIZING" }
     | { type: "INITIALIZED" }
     | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
-  bundleSourceUrl: string | null;
+  bundleSource:
+    | {
+        type: "SINGLE_URL";
+        bundleSourceUrl: string | null;
+      }
+    | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
+    | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
 }
 
 export interface QueryError {
@@ -98,10 +105,22 @@ export type SetBundleDataSourceAction = {
   type: "SET_BUNDLE_DATA_SOURCE";
   sourceUrl: string;
 };
+export type SetBundleDataMultipleSourcesAction = {
+  type: "SET_BUNDLE_DATA_MULTIPLE_SOURCES";
+  baselineBundleUrl: string;
+  prBundleUrl: string;
+};
+export type SetBundleDataBlobsAction = {
+  type: "SET_BUNDLE_DATA_BLOBS";
+  baselineBlob: string;
+  prBlob: string;
+};
 export type BundleDataAction =
   | MarkBundleDataInitializedAction
   | MarkBundleDataLoadErrorAction
-  | SetBundleDataSourceAction;
+  | SetBundleDataSourceAction
+  | SetBundleDataMultipleSourcesAction
+  | SetBundleDataBlobsAction;
 
 export interface Tutorial {
   exampleName: string;

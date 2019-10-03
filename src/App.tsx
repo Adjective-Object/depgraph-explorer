@@ -7,16 +7,20 @@ import QueryTutorial from "./components/QueryEditor/QueryTutorial";
 import GraphOptionsEditor from "./components/GraphOptionsEditor/GraphOptionsEditor";
 import BundleSizeSummaryTable from "./components/GraphView/BundleSizeSummaryTable";
 import ToggleArrow from "./components/ToggleArrow/ToggleArrow";
+import BundleLoaderView from "./components/BundleLoaderView/BundleLoaderView";
 import "./App.css";
 import { useSelector } from "react-redux";
 import { RootStore } from "./reducers/schema";
 import { setAppUIState } from "./actions/setAppUIState";
 
 const App: React.FC = () => {
-  const { isLeftOpen, isRightOpen } = useSelector((store: RootStore) => ({
-    isLeftOpen: store.appUIState.isLeftSidebarOpen,
-    isRightOpen: store.appUIState.isRightSidebarOpen
-  }));
+  const { isLeftOpen, isRightOpen, hasBundleSource } = useSelector(
+    (store: RootStore) => ({
+      isLeftOpen: store.appUIState.isLeftSidebarOpen,
+      isRightOpen: store.appUIState.isRightSidebarOpen,
+      hasBundleSource: store.bundleData.bundleSourceUrl !== null
+    })
+  );
   const toggleLeftSidebar = React.useCallback(() => {
     setAppUIState({
       isLeftSidebarOpen: !isLeftOpen
@@ -44,15 +48,21 @@ const App: React.FC = () => {
         />
       </header>
       <section className="App-body">
-        {isLeftOpen && <BundleSizeSummaryTable />}
-        <GraphView />
-        {isRightOpen && (
-          <QuerySidebar>
-            <QueryEditor />
-            <GraphOptionsEditor />
-            <QueryExamples />
-            <QueryTutorial />
-          </QuerySidebar>
+        {hasBundleSource ? (
+          <>
+            {isLeftOpen && <BundleSizeSummaryTable />}
+            <GraphView />
+            {isRightOpen && (
+              <QuerySidebar>
+                <QueryEditor />
+                <GraphOptionsEditor />
+                <QueryExamples />
+                <QueryTutorial />
+              </QuerySidebar>
+            )}
+          </>
+        ) : (
+          <BundleLoaderView />
         )}
       </section>
     </div>

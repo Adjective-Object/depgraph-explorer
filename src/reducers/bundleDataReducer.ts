@@ -10,8 +10,24 @@ export const bundleDataReducer = produce(
   ): BundleDataState => {
     switch (action.type) {
       case "SET_BUNDLE_DATA_SOURCE":
-        data.bundleSourceUrl = action.sourceUrl;
+        data.bundleSource = {
+          type: "SINGLE_URL",
+          bundleSourceUrl: action.sourceUrl
+        };
         return data;
+      case "SET_BUNDLE_DATA_MULTIPLE_SOURCES":
+        data.bundleSource = {
+          type: "MULTIPLE_URLS",
+          prUrl: action.prBundleUrl,
+          baselineUrl: action.baselineBundleUrl
+        };
+        return data;
+      case "SET_BUNDLE_DATA_BLOBS":
+        data.bundleSource = {
+          type: "MULTIPLE_BLOBS",
+          prBlob: action.prBlob,
+          baselineBlob: action.baselineBlob
+        };
       case "MARK_BUNDLE_DATA_ERROR":
         data.initializationState = {
           type: "INITIALIZATION_FAILURE",
