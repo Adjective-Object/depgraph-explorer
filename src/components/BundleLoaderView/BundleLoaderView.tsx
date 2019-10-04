@@ -1,5 +1,8 @@
 import * as React from "react";
 import "./BundleLoaderView.css";
+import { useSelector } from "react-redux";
+import { RootStore } from "../../reducers/schema";
+import { setBundleBlobs } from "../../actions/setBundleBlobs";
 
 interface FileLoader {
   isLoading: boolean;
@@ -19,6 +22,9 @@ const FileLoaderView = ({ fileLoader }: { fileLoader: FileLoader }) => {
       {fileLoader.isLoading && (
         <span className="BundleLoaderView-loading">Loading...</span>
       )}
+      {fileLoader.fileContent !== null && (
+        <span className="BundleLoaderView-loaded">Loaded!</span>
+      )}
       {fileLoader.loadError && (
         <span className="BundleLoaderView-error">
           {fileLoader.loadError.toString()}
@@ -35,10 +41,9 @@ const useFileLoader = () => {
 
   const onChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const target = e.target;
       const files = e.target.files as FileList;
 
-      if (!files || files.length != 0) {
+      if (!files || files.length !== 1) {
         return;
       }
 
@@ -46,14 +51,15 @@ const useFileLoader = () => {
 
       const fileReader = new FileReader();
       fileReader.readAsText(files[0]);
-      fileReader.onload = e => {
-        if (e.target && typeof e.target.result === "string") {
-          setFileContent(e.target.result);
+      fileReader.onload = (e: ProgressEvent) => {
+        setIsLoading(false);
+        if (e.target && typeof fileReader.result === "string") {
+          setFileContent(fileReader.result);
         }
       };
-      fileReader.onerror = e => {
+      fileReader.onerror = (e: ProgressEvent) => {
         setIsLoading(false);
-        e.target && setLoadError(e.target.error);
+        fileReader && setLoadError(fileReader.error);
       };
     },
     []
@@ -70,6 +76,17 @@ const useFileLoader = () => {
 const BundleLoaderView = () => {
   const baseline = useFileLoader();
   const pullRequest = useFileLoader();
+
+  const isUninitialized = useSelector(
+    (store: RootStore) =>
+      store.bundleData.initializationState.type === "UNINITIALIZED"
+  );
+
+  React.useEffect(() => {
+    if (isUninitialized && baseline.fileContent && pullRequest.fileContent) {
+      setBundleBlobs(baseline.fileContent, pullRequest.fileContent);
+    }
+  }, [isUninitialized, baseline.fileContent, pullRequest.fileContent]);
 
   return (
     <section className="BundleLoaderView-wrapper">

@@ -11,20 +11,27 @@ export interface BothBundleStats {
   pullRequestGraph: ModuleGraphWithChildren;
 }
 
-export interface BundleDataState {
+export interface InitializedBundleDataState {
   initializationState:
-    | { type: "UNINITIALIZED" }
     | { type: "INITIALIZING" }
     | { type: "INITIALIZED" }
     | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
   bundleSource:
     | {
         type: "SINGLE_URL";
-        bundleSourceUrl: string | null;
+        bundleSourceUrl: string;
       }
     | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
     | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
 }
+export interface UninitializedBundleDataState {
+  initializationState: { type: "UNINITIALIZED" };
+  bundleSource: null;
+}
+
+export type BundleDataState =
+  | InitializedBundleDataState
+  | UninitializedBundleDataState;
 
 export interface QueryError {
   type: "QUERY_ERROR";

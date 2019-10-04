@@ -1,0 +1,38 @@
+[
+    {
+        "exampleName": "Added Files",
+        "exampleBody": "added"
+    },
+    {
+        "exampleName": "Removed Files",
+        "exampleBody": "removed"
+    },
+    {
+        "exampleName": "Changed Files",
+        "exampleBody": "changed"
+    },
+    {
+        "exampleName": "Reading Pane",
+        "exampleBody": "'owa-mail-reading-pane-view/lib'"
+    },
+    {
+        "exampleName": "Reading Pane and Compose",
+        "exampleBody": "'owa-mail-reading-pane-view/lib'\n  | 'owa-mail-compose-view/lib' "
+    },
+    {
+        "exampleName": "Json files in Reading Pane",
+        "exampleBody": "'reading-pane/*json'\n "
+    },
+    {
+        "exampleName": "reading-pane files that include the current changes",
+        "exampleBody": "includes changed & 'owa-mail-reading-pane-view'"
+    },
+    {
+        "exampleName": "package indexes included by Reading Pane",
+        "exampleBody": "(included_by '*owa-mail-reading-pane-view*') & '*index.js*'!"
+    },
+    {
+        "exampleName": "package indexes included by Reading Pane, tracing dependenices",
+        "exampleBody": "interpolate( (included_by '*owa-mail-reading-pane-view*') & '*index.js*'! )"
+    }
+]

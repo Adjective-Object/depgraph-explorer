@@ -7,9 +7,16 @@ export interface InitStoreFromUrlRequestMessage {
   payloadUrl: string;
 }
 
+export interface InitStoreFromMultiUrlRequestMessage {
+  type: "INIT_STORE_FROM_MULTI_URL";
+  prUrl: string;
+  baselineUrl: string;
+}
+
 export interface InitStoreFromBundleRequestMessage {
-  type: "INIT_STORE_FROM_BUNDLE_STATS";
-  bundleData: BothBundleStats;
+  type: "INIT_STORE_FROM_BUNDLE_STATS_STRINGS";
+  baselineString: string;
+  prString: string;
 }
 
 export interface PerformQueryRequestMessage {

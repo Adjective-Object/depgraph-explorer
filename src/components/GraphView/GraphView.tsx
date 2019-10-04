@@ -1,24 +1,47 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { RootStore } from "../../reducers/schema";
+import { RootStore, InitializedBundleDataState } from "../../reducers/schema";
 import "./GraphView.css";
 import { isQueryError, isQuerySuccess } from "../../utils/isQueryResultError";
 import VisGraph from "./VisGraph";
 
 const PendingInitialLoad = () => (
-  <section className="GraphView-initial-load">Fetching bundle data..</section>
+  <section className="GraphView-initial-load">
+    Fetching and parsing bundle data..
+  </section>
 );
 
-const InitialLoadFailed = ({ errorMessage }: { errorMessage: string }) => {
-  const bundlePath = useSelector(
-    (store: RootStore) => store.bundleData.bundleSourceUrl
-  );
+const InitialLoadFailed = ({
+  bundleData,
+  errorMessage
+}: {
+  bundleData: InitializedBundleDataState;
+  errorMessage: string;
+}) => {
+  let errVis = (() => {
+    const bundleSource = bundleData.bundleSource;
+    switch (bundleSource.type) {
+      case "SINGLE_URL":
+        return (
+          <p>
+            Url: <code>"{bundleSource.bundleSourceUrl}"</code>
+          </p>
+        );
+      case "MULTIPLE_URLS":
+        return (
+          <p>
+            Bundle url: <code>"{bundleSource.baselineUrl}"</code> <br></br>
+            PR url: <code>"{bundleSource.prUrl}"</code>
+          </p>
+        );
+      case "MULTIPLE_BLOBS":
+        return <p>Local blobs.</p>;
+    }
+  })();
   return (
     <section className="GraphView-error">
       <h2>Error Loading bundle</h2>
-      <p>
-        Url: <code>"{bundlePath}"</code>
-      </p>
+      {errVis}
       <pre>{errorMessage}</pre>
     </section>
   );
@@ -64,9 +87,9 @@ const GraphViewTooLarge = ({
 const STATIC_LIMIT = 1000;
 
 const GraphView = () => {
-  const { initializationState, isPending, numNodes, queryResult } = useSelector(
+  const { bundleData, isPending, numNodes, queryResult } = useSelector(
     (store: RootStore) => ({
-      initializationState: store.bundleData.initializationState,
+      bundleData: store.bundleData,
       isPending:
         store.query.queryResult === null &&
         store.query.lastSucessfulCompilation !== null,
@@ -91,10 +114,13 @@ const GraphView = () => {
 
   return (
     <section className="GraphView-host">
-      {initializationState.type === "UNINITIALIZED" ? (
+      {bundleData.initializationState.type === "UNINITIALIZED" ? (
         <PendingInitialLoad />
-      ) : initializationState.type === "INITIALIZATION_FAILURE" ? (
-        <InitialLoadFailed errorMessage={initializationState.errorMessage} />
+      ) : bundleData.initializationState.type === "INITIALIZATION_FAILURE" ? (
+        <InitialLoadFailed
+          bundleData={bundleData as InitializedBundleDataState}
+          errorMessage={bundleData.initializationState.errorMessage}
+        />
       ) : isPending || queryResult == null ? (
         <GraphViewPending />
       ) : !showAnyway && numNodes > STATIC_LIMIT ? (
