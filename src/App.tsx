@@ -18,7 +18,8 @@ const App: React.FC = () => {
     (store: RootStore) => ({
       isLeftOpen: store.appUIState.isLeftSidebarOpen,
       isRightOpen: store.appUIState.isRightSidebarOpen,
-      hasBundleSource: store.bundleData.bundleSourceUrl !== null
+      hasBundleSource:
+        store.bundleData.initializationState.type !== "UNINITIALIZED"
     })
   );
   const toggleLeftSidebar = React.useCallback(() => {

@@ -10,6 +10,8 @@ import { QueryExecutor } from "./worker/QueryExecutor";
 import { buildGraphVisualization } from "./worker/buildGraphVisualization";
 import { Query } from "./utils/Query";
 import { getBundleSizeSummary } from "./worker/getBundleSizeSummary";
+import { BothBundleStats } from "./reducers/schema";
+import { getModuleGraphWithChildren } from "webpack-bundle-diff-add-children";
 
 // eslint-disable-next-line no-restricted-globals
 const ctx: Worker = self as any;
@@ -48,13 +50,31 @@ ctx.onmessage = function(e: MessageEvent): void {
   const messageData = e.data as AppToWorkerMessage;
   console.log("Worker: Message received from app script", messageData);
   switch (messageData.type) {
-    case "INIT_STORE_FROM_BUNDLE_STATS":
-      queryExecutor.setData(messageData.bundleData);
-      isInitialized = true;
-      const message: InitStoreResponseMessage = {
-        type: "STORE_LOADED"
-      };
-      ctx.postMessage(message);
+    case "INIT_STORE_FROM_BUNDLE_STATS_STRINGS":
+      try {
+        const stats: BothBundleStats = {
+          baselineGraph: getModuleGraphWithChildren(
+            JSON.parse(messageData.baselineString).bundleData.graph
+          ),
+          pullRequestGraph: getModuleGraphWithChildren(
+            JSON.parse(messageData.prString).bundleData.graph
+          )
+        };
+
+        queryExecutor.setData(stats);
+        isInitialized = true;
+        const message: InitStoreResponseMessage = {
+          type: "STORE_LOADED"
+        };
+        ctx.postMessage(message);
+      } catch (e) {
+        const message: InitStoreResponseErrorMessage = {
+          type: "STORE_LOAD_ERROR",
+          errorMessage: e.toString()
+        };
+        ctx.postMessage(message);
+        console.error(e);
+      }
       break;
     case "INIT_STORE_FROM_URL":
       fetch(messageData.payloadUrl)

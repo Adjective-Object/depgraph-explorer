@@ -4,7 +4,7 @@ export const bundleDataReducer = produce(
   (
     data: BundleDataState = {
       initializationState: { type: "UNINITIALIZED" },
-      bundleSourceUrl: null
+      bundleSource: null
     },
     action: AppAction
   ): BundleDataState => {
@@ -14,12 +14,18 @@ export const bundleDataReducer = produce(
           type: "SINGLE_URL",
           bundleSourceUrl: action.sourceUrl
         };
+        data.initializationState = {
+          type: "INITIALIZING"
+        };
         return data;
       case "SET_BUNDLE_DATA_MULTIPLE_SOURCES":
         data.bundleSource = {
           type: "MULTIPLE_URLS",
           prUrl: action.prBundleUrl,
           baselineUrl: action.baselineBundleUrl
+        };
+        data.initializationState = {
+          type: "INITIALIZING"
         };
         return data;
       case "SET_BUNDLE_DATA_BLOBS":
@@ -28,6 +34,10 @@ export const bundleDataReducer = produce(
           prBlob: action.prBlob,
           baselineBlob: action.baselineBlob
         };
+        data.initializationState = {
+          type: "INITIALIZING"
+        };
+        return data;
       case "MARK_BUNDLE_DATA_ERROR":
         data.initializationState = {
           type: "INITIALIZATION_FAILURE",

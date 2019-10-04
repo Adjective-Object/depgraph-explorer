@@ -7,7 +7,8 @@ import { store } from "./store";
 import App from "./App";
 import {
   InitStoreFromUrlRequestMessage,
-  WorkerToAppMessage
+  WorkerToAppMessage,
+  InitStoreFromMultiUrlRequestMessage
 } from "./worker/messages";
 import { markBundleDataInitialized } from "./actions/markBundleDataInitialized";
 import { setQueryResult } from "./actions/setQueryResult";
@@ -24,6 +25,7 @@ import { setBundleSource } from "./actions/setBundleSource";
 import { setTutorials } from "./actions/setTutorials";
 import { markBundleDataLoadError } from "./actions/markBundleDataLoadError";
 import { defaultTutorials } from "./defaultTutorials";
+import { setBundleMultipleSources } from "./actions/setBundleMultipleSources";
 
 //////////////////////
 // Spawn the worker //
@@ -35,6 +37,14 @@ appWorker.onmessage = function(e: MessageEvent): void {
   switch (messageData.type) {
     case "STORE_LOADED":
       markBundleDataInitialized();
+      // handle load / compilation message race
+      const compResult = store.getState().query.compilationResult;
+      if (compResult && compResult.type === "CompilationSuccess") {
+        appWorker.postMessage({
+          type: "QUERY_REQUEST",
+          query: compResult.query
+        });
+      }
       break;
     case "STORE_LOAD_ERROR":
       markBundleDataLoadError(messageData.errorMessage);
@@ -69,13 +79,29 @@ setAppUIState({
   isLeftSidebarOpen: !(urlParams.has("lc") || window.innerWidth < 1000),
   isRightSidebarOpen: !urlParams.has("rc")
 });
-const bundleDataSource: string = urlParams.get("bundle") || "./stats.json";
-const initStoreMessage: InitStoreFromUrlRequestMessage = {
-  type: "INIT_STORE_FROM_URL",
-  payloadUrl: bundleDataSource
-};
-setBundleSource(bundleDataSource);
-appWorker.postMessage(initStoreMessage);
+
+// Init bundle data form URL params
+const bundleDataSingleUrl: string | null = urlParams.get("bundle");
+const bundleDataPrUrl: string | null = urlParams.get("pr_bundle");
+const bundleDataBaselineUrl: string | null = urlParams.get("baseline_bundle");
+
+if (bundleDataSingleUrl) {
+  setBundleSource(bundleDataSingleUrl);
+  const initStoreMessage: InitStoreFromUrlRequestMessage = {
+    type: "INIT_STORE_FROM_URL",
+    payloadUrl: bundleDataSingleUrl
+  };
+  appWorker.postMessage(initStoreMessage);
+} else if (bundleDataPrUrl && bundleDataBaselineUrl) {
+  setBundleMultipleSources(bundleDataPrUrl, bundleDataBaselineUrl);
+  const initStoreMessage: InitStoreFromMultiUrlRequestMessage = {
+    type: "INIT_STORE_FROM_MULTI_URL",
+    prUrl: bundleDataPrUrl,
+    baselineUrl: bundleDataBaselineUrl
+  };
+  appWorker.postMessage(initStoreMessage);
+}
+
 // fetch the tutorial
 fetch("./tutorial_examples.json")
   .then(r => r.json())

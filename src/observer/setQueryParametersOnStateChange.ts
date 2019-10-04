@@ -16,8 +16,18 @@ const getQueryParams = (store: RootStore): URLSearchParams => {
   if (store.graphOptions.shouldStabilize) {
     params.set("stab", "");
   }
-  if (store.bundleData.bundleSourceUrl) {
-    params.set("bundle", store.bundleData.bundleSourceUrl);
+  if (store.bundleData.bundleSource) {
+    const source = store.bundleData.bundleSource;
+    switch (source.type) {
+      case "SINGLE_URL":
+        params.set("bundle", source.bundleSourceUrl);
+        break;
+      case "MULTIPLE_URLS":
+        params.set("pr_bundle", source.prUrl);
+        params.set("base_bundle", source.baselineUrl);
+        break;
+      case "MULTIPLE_BLOBS":
+    }
   }
   params.sort();
   return params;
