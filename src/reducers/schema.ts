@@ -3,8 +3,8 @@ import {
   CompilationResult,
   CompilationSuccess
 } from "../grammar/compilationTypes";
-import { Data as VisData } from "vis";
 import { Query } from "../utils/Query";
+import * as Vis from "vis";
 
 export interface BothBundleStats {
   baselineGraph: ModuleGraphWithChildren;
@@ -54,7 +54,7 @@ export interface BundleSizeSummary {
 
 export interface QuerySuccess {
   type: "QUERY_SUCCESS";
-  data: VisData;
+  data: GeneratedGraphData;
   summary: BundleSizeSummary;
 }
 
@@ -86,7 +86,7 @@ export type SetFilterTextAction = {
 export type SetQueryResultAction = {
   type: "SET_QUERY_RESULT";
   forQuery: Query;
-  resultingGraph: VisData;
+  resultingGraph: GeneratedGraphData;
   summary: BundleSizeSummary;
 };
 
@@ -142,6 +142,7 @@ export type TutorialAction = SetTutorialsAction;
 export interface GraphViewOptions {
   isHierarchical: boolean;
   shouldStabilize: boolean;
+  shouldShowReasonEdges: boolean;
 }
 
 /**
@@ -175,3 +176,9 @@ export type AppAction =
   | GraphOptionsActions
   | AppUIActions
   | TutorialAction;
+
+export interface GeneratedGraphData {
+  nodes: Vis.Node[];
+  reasonChildrenEdges: Vis.Edge[];
+  dependencyEdges: Vis.Edge[];
+}

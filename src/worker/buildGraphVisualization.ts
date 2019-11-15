@@ -2,20 +2,36 @@ import * as Vis from "vis";
 import { Palette } from "./Palette";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 import { default as Color } from "color";
-import { BothBundleStats } from "../reducers/schema";
+import { BothBundleStats, GeneratedGraphData } from "../reducers/schema";
 import {
   ModuleGraphNodeWithChildren,
   ModuleGraphWithChildren
 } from "webpack-bundle-diff-add-children";
+import {
+  ModuleGraphNodeWithReasons,
+  ModuleGraphWithReasons
+} from "webpack-bundle-diff-add-reasons";
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../utils/colors";
 
-const getDependencies = (maybeNode: ModuleGraphNodeWithChildren | undefined) =>
+type ModuleGraph =
+  | ModuleGraphWithReasons<
+      ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
+    >
+  | ModuleGraphWithChildren;
+
+type ModuleGraphNode = ModuleGraphNodeWithChildren &
+  Partial<ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>>;
+
+const getDependencies = (maybeNode: ModuleGraphNode | undefined) =>
   maybeNode ? maybeNode.dependencies || [] : [];
 
+const getReasonChildren = (maybeNode: ModuleGraphNode | undefined) =>
+  maybeNode ? maybeNode.reasonChildren || [] : [];
+
 const getNodeId = (
-  oldGraphNode: ModuleGraphNodeWithChildren | undefined,
-  newGraphNode: ModuleGraphNodeWithChildren | undefined
+  oldGraphNode: ModuleGraphNode | undefined,
+  newGraphNode: ModuleGraphNode | undefined
 ): string => {
   if (oldGraphNode) {
     return `old-${oldGraphNode.id}`;
@@ -24,6 +40,41 @@ const getNodeId = (
   } else {
     throw new Error("neither new or old graph node was initialized");
   }
+};
+
+const getOutgoingEdges = (
+  filteredBundleStats: BothBundleStats,
+  oldGraphNode: ModuleGraphNode,
+  newGraphNode: ModuleGraphNode,
+  getEdgeTargets: (maybeNode: ModuleGraphNode | undefined) => string[]
+): Vis.Edge[] => {
+  const oldEdgeTargets: Set<string> = new Set(getEdgeTargets(oldGraphNode));
+  const newEdgeTargets: Set<string> = new Set(getEdgeTargets(newGraphNode));
+
+  const allDependencies: Set<string> = union(oldEdgeTargets, newEdgeTargets);
+
+  const fromNodeId: string = getNodeId(oldGraphNode, newGraphNode);
+  const edges: Vis.Edge[] = [];
+
+  allDependencies.forEach(dependencyName => {
+    const oldDependencyNode = filteredBundleStats.baselineGraph[dependencyName];
+    const newDependencyNode =
+      filteredBundleStats.pullRequestGraph[dependencyName];
+    if (!newDependencyNode && !oldDependencyNode) {
+      return;
+    }
+    const dependencyId = getNodeId(oldDependencyNode, newDependencyNode);
+    const inNew = newEdgeTargets.has(dependencyName);
+    const inOld = oldEdgeTargets.has(dependencyName);
+
+    edges.push({
+      from: fromNodeId,
+      to: dependencyId,
+      color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR
+    });
+  });
+
+  return edges;
 };
 
 // Uses the NES colour palette by default.
@@ -112,7 +163,7 @@ const uniq = <T>(a: T[]) => {
 export function buildGraphVisualization(
   filteredBundleStats: BothBundleStats,
   fullBundleStats: BothBundleStats
-): Vis.Data {
+): GeneratedGraphData {
   const allNodeNames = uniq(
     Object.keys(filteredBundleStats.baselineGraph).concat(
       Object.keys(filteredBundleStats.pullRequestGraph)
@@ -120,7 +171,8 @@ export function buildGraphVisualization(
   );
 
   const nodes: Vis.Node[] = [];
-  const edges: Vis.Edge[] = [];
+  const reasonChildrenEdges: Vis.Edge[] = [];
+  const dependencyEdges: Vis.Edge[] = [];
 
   for (let nodeName of allNodeNames) {
     const oldGraphNode = filteredBundleStats.baselineGraph[nodeName];
@@ -144,8 +196,8 @@ export function buildGraphVisualization(
     }
 
     const wasHoisted = (
-      node: ModuleGraphNodeWithChildren | undefined,
-      graph: ModuleGraphWithChildren
+      node: ModuleGraphNode | undefined,
+      graph: ModuleGraph
     ) =>
       node &&
       node.parents.length === 1 &&
@@ -212,33 +264,24 @@ export function buildGraphVisualization(
 
     nodes.push(node);
 
-    const oldDependencies: Set<string> = new Set(getDependencies(oldGraphNode));
-    const newDependencies: Set<string> = new Set(getDependencies(newGraphNode));
-
-    const allDependencies: Set<string> = union(
-      oldDependencies,
-      newDependencies
+    const thisNodeDependencyEdges = getOutgoingEdges(
+      filteredBundleStats,
+      oldGraphNode,
+      newGraphNode,
+      getDependencies
     );
+    thisNodeDependencyEdges.forEach((x: Vis.Edge) => dependencyEdges.push(x));
 
-    allDependencies.forEach(dependencyName => {
-      const oldDependencyNode =
-        filteredBundleStats.baselineGraph[dependencyName];
-      const newDependencyNode =
-        filteredBundleStats.pullRequestGraph[dependencyName];
-      if (!newDependencyNode && !oldDependencyNode) {
-        return;
-      }
-      const dependencyId = getNodeId(oldDependencyNode, newDependencyNode);
-      const inNew = newDependencies.has(dependencyName);
-      const inOld = oldDependencies.has(dependencyName);
-
-      edges.push({
-        from: nodeId,
-        to: dependencyId,
-        color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR
-      });
-    });
+    const thisNodeReasonChildrenEdges = getOutgoingEdges(
+      filteredBundleStats,
+      oldGraphNode,
+      newGraphNode,
+      getReasonChildren
+    );
+    thisNodeReasonChildrenEdges.forEach((x: Vis.Edge) =>
+      reasonChildrenEdges.push(x)
+    );
   }
 
-  return { nodes, edges };
+  return { nodes, reasonChildrenEdges, dependencyEdges };
 }

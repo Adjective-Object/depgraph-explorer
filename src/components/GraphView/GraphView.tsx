@@ -87,20 +87,25 @@ const GraphViewTooLarge = ({
 const STATIC_LIMIT = 1000;
 
 const GraphView = () => {
-  const { bundleData, isPending, numNodes, queryResult } = useSelector(
-    (store: RootStore) => ({
-      bundleData: store.bundleData,
-      isPending:
-        store.query.queryResult === null &&
-        store.query.lastSucessfulCompilation !== null,
-      numNodes: Number(
-        isQuerySuccess(store.query.queryResult) &&
-          store.query.queryResult.data.nodes &&
-          store.query.queryResult.data.nodes.length
-      ),
-      queryResult: store.query.queryResult
-    })
-  );
+  const {
+    bundleData,
+    isPending,
+    numNodes,
+    shouldShowReasonEdges,
+    queryResult
+  } = useSelector((store: RootStore) => ({
+    bundleData: store.bundleData,
+    isPending:
+      store.query.queryResult === null &&
+      store.query.lastSucessfulCompilation !== null,
+    numNodes: Number(
+      isQuerySuccess(store.query.queryResult) &&
+        store.query.queryResult.data.nodes &&
+        store.query.queryResult.data.nodes.length
+    ),
+    shouldShowReasonEdges: store.graphOptions.shouldShowReasonEdges,
+    queryResult: store.query.queryResult
+  }));
 
   const [showAnyway, setShowAnyway] = React.useState(false);
   const onShowAnyway = React.useCallback(() => {
@@ -111,6 +116,19 @@ const GraphView = () => {
       setShowAnyway(false);
     }
   }, [showAnyway, isPending]);
+
+  const resolvedData = React.useMemo(() => {
+    if (!queryResult || isQueryError(queryResult)) {
+      return null;
+    }
+
+    return {
+      nodes: queryResult.data.nodes,
+      edges: shouldShowReasonEdges
+        ? queryResult.data.reasonChildrenEdges
+        : queryResult.data.dependencyEdges
+    };
+  }, [queryResult, shouldShowReasonEdges]);
 
   return (
     <section className="GraphView-host">
@@ -134,7 +152,7 @@ const GraphView = () => {
       ) : numNodes === 0 ? (
         <GraphViewEmpty />
       ) : (
-        <VisGraph graphData={queryResult.data} />
+        <VisGraph graphData={resolvedData} />
       )}
     </section>
   );

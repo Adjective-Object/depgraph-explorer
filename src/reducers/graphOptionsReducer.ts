@@ -5,7 +5,8 @@ export const graphOptionsReducer = produce(
   (
     store: GraphViewOptions = {
       isHierarchical: false,
-      shouldStabilize: false
+      shouldStabilize: false,
+      shouldShowReasonEdges: true
     },
     action: AppAction
   ): GraphViewOptions => {

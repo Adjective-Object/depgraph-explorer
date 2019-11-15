@@ -1,6 +1,10 @@
 import { Data as VisData } from "vis";
 import { Query } from "../utils/Query";
-import { BundleSizeSummary, BothBundleStats } from "../reducers/schema";
+import {
+  BundleSizeSummary,
+  BothBundleStats,
+  GeneratedGraphData
+} from "../reducers/schema";
 
 export interface InitStoreFromUrlRequestMessage {
   type: "INIT_STORE_FROM_URL";
@@ -36,7 +40,7 @@ export interface InitStoreResponseErrorMessage {
 export interface PerformQueryResponseMessage {
   type: "QUERY_RESULT";
   forQuery: Query;
-  result: VisData;
+  result: GeneratedGraphData;
   summary: BundleSizeSummary;
 }
 

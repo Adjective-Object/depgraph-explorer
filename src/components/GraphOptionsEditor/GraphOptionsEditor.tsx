@@ -5,9 +5,11 @@ import { RootStore } from "../../reducers/schema";
 import { setGraphOptions } from "../../actions/setGraphOptions";
 
 const GraphOptionsEditor = () => {
-  const { isHierarchical, shouldStabilize } = useSelector(
-    (store: RootStore) => store.graphOptions
-  );
+  const {
+    isHierarchical,
+    shouldStabilize,
+    shouldShowReasonEdges
+  } = useSelector((store: RootStore) => store.graphOptions);
   const setIsHierarchicalFromCheckbox = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGraphOptions({
@@ -20,6 +22,14 @@ const GraphOptionsEditor = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGraphOptions({
         shouldStabilize: !!e.currentTarget.checked
+      });
+    },
+    []
+  );
+  const setShouldShowReasonEdgesFromCheckbox = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setGraphOptions({
+        shouldShowReasonEdges: !!e.currentTarget.checked
       });
     },
     []
@@ -45,6 +55,26 @@ const GraphOptionsEditor = () => {
           checked={shouldStabilize}
         />
         pre-stabilize the network
+      </label>
+      <label className="GraphViewOptions-label">
+        <input
+          type="checkbox"
+          name="shouldShowReasonEdges"
+          onChange={setShouldShowReasonEdgesFromCheckbox}
+          checked={shouldShowReasonEdges}
+        />
+        <p>
+          show reason edges (instead of module parentage). <br />
+          This visualzies actual import dependencies instead of hoisted
+          dependencies. <br />
+          <b>
+            This will not work unless you build this into your bundlestats.json
+            ahead of time. see{" "}
+            <a href="https://github.com/Adjective-Object/webpack-bundle-diff-add-reasons">
+              webpack-bundle-diff-add-reasons
+            </a>
+          </b>
+        </p>
       </label>
     </section>
   );

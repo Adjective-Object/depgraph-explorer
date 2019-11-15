@@ -9877,6 +9877,9 @@ webpack-bundle-diff-add-children@^0.1.0:
   dependencies:
     webpack-bundle-diff "^0.5.0"
 
+webpack-bundle-diff-add-reasons@../webpack-bundle-diff-add-reasons/dist:
+  version "0.0.0"
+
 webpack-bundle-diff@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/webpack-bundle-diff/-/webpack-bundle-diff-0.5.0.tgz#2f2454b89346e085b998ecc5f810b02c5a7b04ce"
