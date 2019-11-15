@@ -21,6 +21,8 @@ import { setAppUIState } from "./actions/setAppUIState";
 
 import "./observer/postToWorkerDebouncedOnQueryChange";
 import "./observer/setQueryParametersOnStateChange";
+import "./observer/loadBundleOnSourceSet";
+
 import { setBundleSource } from "./actions/setBundleSource";
 import { setTutorials } from "./actions/setTutorials";
 import { markBundleDataLoadError } from "./actions/markBundleDataLoadError";

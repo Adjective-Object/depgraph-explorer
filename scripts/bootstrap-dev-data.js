@@ -10,24 +10,34 @@ const getModuleGraphWithReasons = require("webpack-bundle-diff-add-reasons")
 
 console.log("reading example data");
 const exampleDataDir = path.join(__dirname, "..", "example-data");
-const statsJson = JSON.parse(
-  fs.readFileSync(path.join(exampleDataDir, "bonsai-stats.json"), "utf-8")
+const baselineStatsJson = JSON.parse(
+  fs.readFileSync(
+    path.join(exampleDataDir, "bonsai-stats-baseline.json"),
+    "utf-8"
+  )
 );
-const bundleData = deriveBundleData(statsJson);
+const prStatsJson = JSON.parse(
+  fs.readFileSync(path.join(exampleDataDir, "bonsai-stats-pr.json"), "utf-8")
+);
+const baselineBundleData = deriveBundleData(baselineStatsJson);
+const prBundleData = deriveBundleData(prStatsJson);
 
-console.log("adding children");
-const graphWithChildren = getModuleGraphWithChildren(bundleData.graph);
-const graphWithChildrenAndReasons = getModuleGraphWithReasons(
-  graphWithChildren,
-  statsJson
+console.log("adding extra data");
+const baselineGraph = getModuleGraphWithReasons(
+  getModuleGraphWithChildren(baselineBundleData.graph),
+  baselineStatsJson
+);
+const pullRequestGraph = getModuleGraphWithReasons(
+  getModuleGraphWithChildren(prBundleData.graph),
+  prStatsJson
 );
 
 const distDir = path.join(__dirname, "..", "public");
-const outFilePath = path.join(distDir, "stats.json");
+const outFilePath = path.join(distDir, "demo-stats.json");
 const fileContent = JSON.stringify(
   {
-    baselineGraph: graphWithChildrenAndReasons,
-    pullRequestGraph: graphWithChildrenAndReasons
+    baselineGraph,
+    pullRequestGraph
   },
   null,
   2

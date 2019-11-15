@@ -1,4 +1,27 @@
 .BundleLoaderView-wrapper {
   margin: auto;
   background-color: #eeeeee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.BundleLoaderView-demoDataButton {
+  appearance: none;
+  padding: 0.5em;
+  margin: 0.5em;
+  background-color: #00f;
+  color: #fff;
+}
+
+.BundleLoaderView-FileLoaderView {
+  padding: 0.5em;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+}
+
+.BundleLoaderView-FileLoaderView input {
+  margin-left: auto;
 }

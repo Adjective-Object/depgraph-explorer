@@ -2,26 +2,15 @@ import * as Vis from "vis";
 import { Palette } from "./Palette";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 import { default as Color } from "color";
-import { BothBundleStats, GeneratedGraphData } from "../reducers/schema";
 import {
-  ModuleGraphNodeWithChildren,
-  ModuleGraphWithChildren
-} from "webpack-bundle-diff-add-children";
-import {
-  ModuleGraphNodeWithReasons,
-  ModuleGraphWithReasons
-} from "webpack-bundle-diff-add-reasons";
+  BothBundleStats,
+  GeneratedGraphData,
+  ModuleGraphNode,
+  ModuleGraph
+} from "../reducers/schema";
+
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../utils/colors";
-
-type ModuleGraph =
-  | ModuleGraphWithReasons<
-      ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
-    >
-  | ModuleGraphWithChildren;
-
-type ModuleGraphNode = ModuleGraphNodeWithChildren &
-  Partial<ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>>;
 
 const getDependencies = (maybeNode: ModuleGraphNode | undefined) =>
   maybeNode ? maybeNode.dependencies || [] : [];

@@ -1,4 +1,3 @@
-import { ModuleGraphWithChildren } from "webpack-bundle-diff-add-children";
 import {
   CompilationResult,
   CompilationSuccess
@@ -6,9 +5,27 @@ import {
 import { Query } from "../utils/Query";
 import * as Vis from "vis";
 
+import {
+  ModuleGraphNodeWithChildren,
+  ModuleGraphWithChildren
+} from "webpack-bundle-diff-add-children";
+import {
+  ModuleGraphNodeWithReasons,
+  ModuleGraphWithReasons
+} from "webpack-bundle-diff-add-reasons";
+
+export type ModuleGraph =
+  | ModuleGraphWithReasons<
+      ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
+    >
+  | ModuleGraphWithChildren;
+
+export type ModuleGraphNode = ModuleGraphNodeWithChildren &
+  Partial<ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>>;
+
 export interface BothBundleStats {
-  baselineGraph: ModuleGraphWithChildren;
-  pullRequestGraph: ModuleGraphWithChildren;
+  baselineGraph: ModuleGraph;
+  pullRequestGraph: ModuleGraph;
 }
 
 export interface InitializedBundleDataState {

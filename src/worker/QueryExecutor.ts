@@ -1,23 +1,21 @@
-import { BothBundleStats } from "../reducers/schema";
-import { Query } from "../utils/Query";
 import {
-  ModuleGraphWithChildren,
-  ModuleGraphNodeWithChildren
-} from "webpack-bundle-diff-add-children";
+  BothBundleStats,
+  ModuleGraphNode,
+  ModuleGraph
+} from "../reducers/schema";
+import { Query } from "../utils/Query";
 
 const traverseGraph = (
-  startingNodes: ModuleGraphNodeWithChildren[],
-  getSucessors: (
-    node: ModuleGraphNodeWithChildren
-  ) => ModuleGraphNodeWithChildren[]
+  startingNodes: ModuleGraphNode[],
+  getSucessors: (node: ModuleGraphNode) => ModuleGraphNode[]
 ) => {
   const visitedIds = new Set();
   startingNodes.forEach(node => visitedIds.add(node.id));
 
-  const frontier: ModuleGraphNodeWithChildren[] = startingNodes.slice();
-  const result: ModuleGraphNodeWithChildren[] = [];
+  const frontier: ModuleGraphNode[] = startingNodes.slice();
+  const result: ModuleGraphNode[] = [];
   while (frontier.length) {
-    const current: ModuleGraphNodeWithChildren | undefined = frontier.pop();
+    const current: ModuleGraphNode | undefined = frontier.pop();
     if (!current) {
       return result;
     }
@@ -58,9 +56,9 @@ function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
 
 const applyQuery = (
   bothGraphs: BothBundleStats,
-  graph: ModuleGraphWithChildren,
+  graph: ModuleGraph,
   query: Query
-): ModuleGraphNodeWithChildren[] => {
+): ModuleGraphNode[] => {
   switch (query.type) {
     case "FILENAME":
       const filterRegex = fileNamePathToRegex(query.fileName, {
@@ -76,7 +74,9 @@ const applyQuery = (
         query.target
       );
       return traverseGraph(innerIncludeQueryResults, node =>
-        node.dependants.map(parentNodeName => graph[parentNodeName])
+        (node.reasons || node.dependants).map(
+          parentNodeName => graph[parentNodeName]
+        )
       );
     case "INCLUDEDBY":
       const innerIncludedByQueryResults = applyQuery(
@@ -85,7 +85,9 @@ const applyQuery = (
         query.target
       );
       return traverseGraph(innerIncludedByQueryResults, node =>
-        node.dependencies.map(childNodeName => graph[childNodeName])
+        (node.reasonChildren || node.dependencies).map(
+          childNodeName => graph[childNodeName]
+        )
       );
     case "AND":
       const andLeftNames = applyQuery(bothGraphs, graph, query.left).map(
@@ -153,7 +155,7 @@ const applyQuery = (
         for (let node of queryToInterpolateResults) {
           console.log("traverse from", node.name);
           traverseGraph([node], node =>
-            node.dependants
+            (node.reasons || node.dependants)
               .map(parentNodeName => graph[parentNodeName])
               .filter(
                 node =>
@@ -177,7 +179,7 @@ const applyQuery = (
           const descendantsInUnion = traverseGraph(
             [startingNode],
             currentChildNode =>
-              currentChildNode.dependencies
+              (currentChildNode.reasonChildren || currentChildNode.dependencies)
                 .filter(childName => unionOfAllParents.has(childName))
                 .filter(childName => {
                   const inParentSetsOf = parentsToOriginalNode.get(childName);
@@ -232,7 +234,7 @@ export class QueryExecutor {
       throw new Error("query executed before bundle data initialized");
     }
 
-    const toGraph = (data: ModuleGraphNodeWithChildren[]) =>
+    const toGraph = (data: ModuleGraphNode[]) =>
       Object.fromEntries(data.map(x => [x.name, x]));
     const queriedData: BothBundleStats = {
       baselineGraph: toGraph(

@@ -3,6 +3,7 @@ import "./BundleLoaderView.css";
 import { useSelector } from "react-redux";
 import { RootStore } from "../../reducers/schema";
 import { setBundleBlobs } from "../../actions/setBundleBlobs";
+import { setBundleSource } from "../../actions/setBundleSource";
 
 interface FileLoader {
   isLoading: boolean;
@@ -11,9 +12,16 @@ interface FileLoader {
   loadError: Error | null;
 }
 
-const FileLoaderView = ({ fileLoader }: { fileLoader: FileLoader }) => {
+const FileLoaderView = ({
+  fileLoader,
+  children
+}: {
+  fileLoader: FileLoader;
+  children?: React.ReactChild;
+}) => {
   return (
-    <>
+    <section className="BundleLoaderView-FileLoaderView">
+      {children}
       <input
         type="file"
         accept="application/json"
@@ -30,7 +38,7 @@ const FileLoaderView = ({ fileLoader }: { fileLoader: FileLoader }) => {
           {fileLoader.loadError.toString()}
         </span>
       )}
-    </>
+    </section>
   );
 };
 
@@ -88,12 +96,19 @@ const BundleLoaderView = () => {
     }
   }, [isUninitialized, baseline.fileContent, pullRequest.fileContent]);
 
+  const useDemoData = React.useCallback(() => {
+    setBundleSource("./demo-stats.json");
+  }, []);
+
   return (
     <section className="BundleLoaderView-wrapper">
-      baseline:
-      <FileLoaderView fileLoader={baseline} />
-      pull request
-      <FileLoaderView fileLoader={pullRequest} />
+      <section className="BundleLoaderView-files">
+        <FileLoaderView fileLoader={baseline}>Baseline: </FileLoaderView>
+        <FileLoaderView fileLoader={pullRequest}>Pull Request: </FileLoaderView>
+      </section>
+      <button className="BundleLoaderView-demoDataButton" onClick={useDemoData}>
+        Use Demo Data
+      </button>
     </section>
   );
 };
