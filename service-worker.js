@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/depgraph-explorer/precache-manifest.85ea750e23d36c1e4e9521a1c7e74197.js"
+  "/depgraph-explorer/precache-manifest.d7edc0fa793a03c4e51bd4d98a00ce11.js"
 );
 
 self.addEventListener('message', (event) => {
