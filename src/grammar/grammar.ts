@@ -1,4 +1,4 @@
-import ohm from "ohm-js";
+import * as ohm from "ohm-js";
 import { Query } from "../utils/Query";
 import { CompilationResult } from "./compilationTypes";
 import { filterGrammarText } from "./grammarDefinition";

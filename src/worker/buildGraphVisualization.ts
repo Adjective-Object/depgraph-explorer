@@ -1,4 +1,4 @@
-import * as Vis from "vis";
+import * as Vis from "vis-network";
 import { Palette } from "./Palette";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 import { default as Color } from "color";
@@ -11,6 +11,7 @@ import {
 
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../utils/colors";
+import md5 from "md5";
 
 const getDependencies = (maybeNode: ModuleGraphNode | undefined) =>
   maybeNode ? maybeNode.dependencies || [] : [];
@@ -59,7 +60,8 @@ const getOutgoingEdges = (
     edges.push({
       from: fromNodeId,
       to: dependencyId,
-      color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR
+      color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR,
+      id: md5(`${fromNodeId}-->${dependencyId}`)
     });
   });
 
@@ -159,7 +161,7 @@ export function buildGraphVisualization(
     )
   );
 
-  const nodes: Vis.Node[] = [];
+  const nodes: (Vis.Node & Pick<Required<Vis.Node>, "id">)[] = [];
   const reasonChildrenEdges: Vis.Edge[] = [];
   const dependencyEdges: Vis.Edge[] = [];
 
@@ -205,14 +207,13 @@ export function buildGraphVisualization(
     }
 
     const nodeSize: string = !!(oldGraphNode && newGraphNode)
-      ? `${formatByteSize(newGraphNode.size)}${
-          newGraphNode.size === oldGraphNode.size
-            ? ""
-            : ", " + formatByteSizeChange(newGraphNode.size - oldGraphNode.size)
-        }`
+      ? `${formatByteSize(newGraphNode.size)}${newGraphNode.size === oldGraphNode.size
+        ? ""
+        : ", " + formatByteSizeChange(newGraphNode.size - oldGraphNode.size)
+      }`
       : oldGraphNode
-      ? `${formatByteSize(oldGraphNode.size)}`
-      : `${formatByteSize(newGraphNode.size)}`;
+        ? `${formatByteSize(oldGraphNode.size)}`
+        : `${formatByteSize(newGraphNode.size)}`;
 
     const addedOrRemoved = isNewlyAdded || isRemoved;
 

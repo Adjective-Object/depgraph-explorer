@@ -102,7 +102,7 @@ export const BundleSizeSummaryTable = () => {
               }
             )
             .map(([name, size]: [string, SizeSummary]) => (
-              <BundleSizeSummaryTableRow name={name} size={size} />
+              <BundleSizeSummaryTableRow key={name} name={name} size={size} />
             ))}
         </tbody>
       </table>

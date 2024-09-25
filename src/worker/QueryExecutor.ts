@@ -121,7 +121,7 @@ const applyQuery = (
     case "REMOVED":
       const oldNames = new Set(Object.keys(bothGraphs.baselineGraph));
       for (let name of Object.keys(bothGraphs.pullRequestGraph)) {
-        console.log("remove", name);
+        // console.log("remove", name);
         oldNames.delete(name);
       }
       return Array.from(oldNames)
@@ -134,7 +134,7 @@ const applyQuery = (
             bothGraphs.pullRequestGraph[nodeName] === undefined ||
             bothGraphs.baselineGraph[nodeName] === undefined ||
             bothGraphs.pullRequestGraph[nodeName].size !=
-              bothGraphs.baselineGraph[nodeName].size
+            bothGraphs.baselineGraph[nodeName].size
         )
         .map(key => graph[key]);
     case "INTERPOLATE":

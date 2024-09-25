@@ -1,11 +1,9 @@
 import { BundleDataState, AppAction } from "./schema";
-import produce from "immer";
-export const bundleDataReducer = produce(
+import { produce } from "immer";
+import { withDefault } from "./util/withDefault";
+export const bundleDataReducer = withDefault(produce(
   (
-    data: BundleDataState = {
-      initializationState: { type: "UNINITIALIZED" },
-      bundleSource: null
-    },
+    data: BundleDataState,
     action: AppAction
   ): BundleDataState => {
     switch (action.type) {
@@ -51,4 +49,7 @@ export const bundleDataReducer = produce(
         return data;
     }
   }
-);
+), {
+  initializationState: { type: "UNINITIALIZED" },
+  bundleSource: null
+});

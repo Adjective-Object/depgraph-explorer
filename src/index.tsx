@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import { Provider } from "react-redux";
 import { store } from "./store";
@@ -13,8 +13,7 @@ import {
 import { markBundleDataInitialized } from "./actions/markBundleDataInitialized";
 import { setQueryResult } from "./actions/setQueryResult";
 import { setFilterText } from "./actions/setFilterText";
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import AppWorker from "worker-loader!./worker";
+import AppWorker from "./worker?worker";
 import { setQueryError } from "./actions/setQueryError";
 import { setGraphOptions } from "./actions/setGraphOptions";
 import { setAppUIState } from "./actions/setAppUIState";
@@ -33,7 +32,7 @@ import { setBundleMultipleSources } from "./actions/setBundleMultipleSources";
 // Spawn the worker //
 //////////////////////
 export const appWorker = new AppWorker();
-appWorker.onmessage = function(e: MessageEvent): void {
+appWorker.onmessage = function (e: MessageEvent): void {
   const messageData = e.data as WorkerToAppMessage;
   console.log("App: Message received from worker script", messageData);
   switch (messageData.type) {
@@ -113,11 +112,8 @@ fetch("./tutorial_examples.json")
 ///////////////////
 // Mount the app //
 ///////////////////
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  rootElement
+const rootContainer = createRoot(document.getElementById("root")!);
+rootContainer.render(<Provider store={store} >
+  <App />
+</Provider >,
 );

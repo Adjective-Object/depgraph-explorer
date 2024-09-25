@@ -1,13 +1,10 @@
 import { AppAction, GraphViewOptions } from "./schema";
 import { produce } from "immer";
+import { withDefault } from "./util/withDefault";
 
-export const graphOptionsReducer = produce(
+export const graphOptionsReducer = withDefault(produce(
   (
-    store: GraphViewOptions = {
-      isHierarchical: false,
-      shouldStabilize: false,
-      shouldShowReasonEdges: true
-    },
+    store: GraphViewOptions,
     action: AppAction
   ): GraphViewOptions => {
     switch (action.type) {
@@ -17,4 +14,8 @@ export const graphOptionsReducer = produce(
         return store;
     }
   }
-);
+), {
+  isHierarchical: false,
+  shouldStabilize: false,
+  shouldShowReasonEdges: false
+});

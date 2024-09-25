@@ -1,8 +1,9 @@
 import { Tutorial, AppAction } from "./schema";
 import { produce } from "immer";
+import { withDefault } from "./util/withDefault";
 
-export const tutorialReducer = produce(
-  (data: Tutorial[] = [], action: AppAction): Tutorial[] => {
+export const tutorialReducer = withDefault(produce(
+  (data: Tutorial[], action: AppAction): Tutorial[] => {
     switch (action.type) {
       case "SET_TUTORIALS":
         return action.newTutorials;
@@ -10,4 +11,4 @@ export const tutorialReducer = produce(
         return data;
     }
   }
-);
+), []);

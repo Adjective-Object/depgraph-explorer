@@ -1,12 +1,10 @@
 import { AppAction, AppUIState } from "./schema";
 import { produce } from "immer";
+import { withDefault } from "./util/withDefault";
 
-export const appUIReducer = produce(
+export const appUIReducer = withDefault(produce(
   (
-    store: AppUIState = {
-      isLeftSidebarOpen: false,
-      isRightSidebarOpen: false
-    },
+    store: AppUIState,
     action: AppAction
   ): AppUIState => {
     switch (action.type) {
@@ -16,4 +14,7 @@ export const appUIReducer = produce(
         return store;
     }
   }
-);
+), {
+  isLeftSidebarOpen: false,
+  isRightSidebarOpen: false
+});

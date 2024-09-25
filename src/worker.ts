@@ -2,7 +2,6 @@ import {
   AppToWorkerMessage,
   InitStoreResponseMessage,
   PerformQueryResponseMessage,
-  PerformQueryRequestMessage,
   PerformQueryResponseErrorMessage,
   InitStoreResponseErrorMessage
 } from "./worker/messages";
@@ -36,17 +35,21 @@ const performQuery = (query: Query) => {
     };
     return response;
   } catch (e) {
-    console.error(e.stack);
+    if (e instanceof Error) {
+      console.error(e.stack);
+    } else {
+      console.error("query gave non-Error error:", e)
+    }
     const response: PerformQueryResponseErrorMessage = {
       type: "QUERY_ERROR",
       forQuery: query,
-      errorMessage: e.toString()
+      errorMessage: `${e}`,
     };
     return response;
   }
 };
 
-ctx.onmessage = function(e: MessageEvent): void {
+ctx.onmessage = function (e: MessageEvent): void {
   const messageData = e.data as AppToWorkerMessage;
   console.log("Worker: Message received from app script", messageData);
   switch (messageData.type) {
@@ -70,7 +73,7 @@ ctx.onmessage = function(e: MessageEvent): void {
       } catch (e) {
         const message: InitStoreResponseErrorMessage = {
           type: "STORE_LOAD_ERROR",
-          errorMessage: e.toString()
+          errorMessage: `${e}`,
         };
         ctx.postMessage(message);
         console.error(e);
@@ -96,7 +99,7 @@ ctx.onmessage = function(e: MessageEvent): void {
         .catch(e => {
           const message: InitStoreResponseErrorMessage = {
             type: "STORE_LOAD_ERROR",
-            errorMessage: e.toString()
+            errorMessage: `${e}`,
           };
           ctx.postMessage(message);
           console.error(e);

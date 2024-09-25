@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./VisGraph.css";
-import * as vis from "vis";
+import * as vis from "vis-network";
 import { useSelector } from "react-redux";
 import { RootStore } from "../../reducers/schema";
 import classNames from "classnames";
@@ -74,6 +74,9 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
     console.log("mount vis network", containerRef.current, options);
     console.log("nodes:", graphData.nodes && graphData.nodes.length);
     console.log("edges:", graphData.edges && graphData.edges.length);
+
+    // clone graph data before passing it to `vis`, since `vis` takes
+    // perpetual exclusive ownership of passed-in data exclusively
 
     const network = new vis.Network(containerRef.current, graphData, options);
 

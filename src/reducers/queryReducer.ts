@@ -2,15 +2,11 @@ import { QueryState, AppAction } from "./schema";
 import { produce } from "immer";
 import { isCompilationError } from "../grammar/isCompilationError";
 import { parseFilterStringToQuery } from "../grammar/grammar";
+import { withDefault } from "./util/withDefault";
 
-export const queryReducer = produce(
+export const queryReducer = withDefault(produce(
   (
-    data: QueryState = {
-      currentFilterText: "",
-      compilationResult: null,
-      lastSucessfulCompilation: null,
-      queryResult: null
-    },
+    data: QueryState,
     action: AppAction
   ): QueryState => {
     switch (action.type) {
@@ -22,7 +18,7 @@ export const queryReducer = produce(
           // Only commit update if the actual result is different deeply
           !isCompilationError(data.compilationResult) &&
           JSON.stringify(data.compilationResult) !==
-            JSON.stringify(data.lastSucessfulCompilation)
+          JSON.stringify(data.lastSucessfulCompilation)
         ) {
           console.log("updating last sucessful compilation");
           data.lastSucessfulCompilation = data.compilationResult;
@@ -33,7 +29,7 @@ export const queryReducer = produce(
         if (
           data.lastSucessfulCompilation !== null &&
           JSON.stringify(action.forQuery) !==
-            JSON.stringify(data.lastSucessfulCompilation.query)
+          JSON.stringify(data.lastSucessfulCompilation.query)
         ) {
           console.log(
             "ignoring query result because the last sucessful compilation does not match the query's target"
@@ -50,7 +46,7 @@ export const queryReducer = produce(
         if (
           data.lastSucessfulCompilation !== null &&
           JSON.stringify(action.forQuery) ===
-            JSON.stringify(data.lastSucessfulCompilation.query)
+          JSON.stringify(data.lastSucessfulCompilation.query)
         ) {
           data.queryResult = {
             type: "QUERY_ERROR",
@@ -63,4 +59,9 @@ export const queryReducer = produce(
     }
     return data;
   }
-);
+), {
+  currentFilterText: "",
+  compilationResult: null,
+  lastSucessfulCompilation: null,
+  queryResult: null
+});

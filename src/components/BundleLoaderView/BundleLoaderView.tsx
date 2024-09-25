@@ -97,7 +97,11 @@ const BundleLoaderView = () => {
   }, [isUninitialized, baseline.fileContent, pullRequest.fileContent]);
 
   const useDemoData = React.useCallback(() => {
-    setBundleSource("./demo-stats.json");
+    let u = new URL(window.location.toString());
+    u.search = ""
+    u.hash = ""
+    u.pathname += "/demo-stats.json"
+    setBundleSource(u.toString() );
   }, []);
 
   return (

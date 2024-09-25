@@ -1,8 +1,6 @@
-import { Data as VisData } from "vis";
 import { Query } from "../utils/Query";
 import {
   BundleSizeSummary,
-  BothBundleStats,
   GeneratedGraphData
 } from "../reducers/schema";
 
