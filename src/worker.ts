@@ -3,7 +3,7 @@ import {
   InitStoreResponseMessage,
   PerformQueryResponseMessage,
   PerformQueryResponseErrorMessage,
-  InitStoreResponseErrorMessage
+  InitStoreResponseErrorMessage,
 } from "./worker/messages";
 import { QueryExecutor } from "./worker/QueryExecutor";
 import { buildGraphVisualization } from "./worker/buildGraphVisualization";
@@ -25,20 +25,20 @@ const performQuery = (query: Query) => {
     const resultGraph = queryExecutor.filter(query);
     const resultVisualizationData = buildGraphVisualization(
       resultGraph,
-      queryExecutor.getData()
+      queryExecutor.getData(),
     );
     const response: PerformQueryResponseMessage = {
       type: "QUERY_RESULT",
       forQuery: query,
       result: resultVisualizationData,
-      summary: getBundleSizeSummary(resultGraph)
+      summary: getBundleSizeSummary(resultGraph),
     };
     return response;
   } catch (e) {
     if (e instanceof Error) {
       console.error(e.stack);
     } else {
-      console.error("query gave non-Error error:", e)
+      console.error("query gave non-Error error:", e);
     }
     const response: PerformQueryResponseErrorMessage = {
       type: "QUERY_ERROR",
@@ -57,17 +57,17 @@ ctx.onmessage = function (e: MessageEvent): void {
       try {
         const stats: BothBundleStats = {
           baselineGraph: getModuleGraphWithChildren(
-            JSON.parse(messageData.baselineString).bundleData.graph
+            JSON.parse(messageData.baselineString).bundleData.graph,
           ),
           pullRequestGraph: getModuleGraphWithChildren(
-            JSON.parse(messageData.prString).bundleData.graph
-          )
+            JSON.parse(messageData.prString).bundleData.graph,
+          ),
         };
 
         queryExecutor.setData(stats);
         isInitialized = true;
         const message: InitStoreResponseMessage = {
-          type: "STORE_LOADED"
+          type: "STORE_LOADED",
         };
         ctx.postMessage(message);
       } catch (e) {
@@ -81,13 +81,13 @@ ctx.onmessage = function (e: MessageEvent): void {
       break;
     case "INIT_STORE_FROM_URL":
       fetch(messageData.payloadUrl)
-        .then(r => r.json())
-        .then(response => {
+        .then((r) => r.json())
+        .then((response) => {
           console.log("got data", response);
           queryExecutor.setData(response);
           isInitialized = true;
           const message: InitStoreResponseMessage = {
-            type: "STORE_LOADED"
+            type: "STORE_LOADED",
           };
           ctx.postMessage(message);
 
@@ -96,7 +96,7 @@ ctx.onmessage = function (e: MessageEvent): void {
             ctx.postMessage(performQuery(pendingInitialQuery));
           }
         })
-        .catch(e => {
+        .catch((e) => {
           const message: InitStoreResponseErrorMessage = {
             type: "STORE_LOAD_ERROR",
             errorMessage: `${e}`,

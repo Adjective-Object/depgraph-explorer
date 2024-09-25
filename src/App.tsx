@@ -19,17 +19,17 @@ const App: React.FC = () => {
       isLeftOpen: store.appUIState.isLeftSidebarOpen,
       isRightOpen: store.appUIState.isRightSidebarOpen,
       hasBundleSource:
-        store.bundleData.initializationState.type !== "UNINITIALIZED"
-    })
+        store.bundleData.initializationState.type !== "UNINITIALIZED",
+    }),
   );
   const toggleLeftSidebar = React.useCallback(() => {
     setAppUIState({
-      isLeftSidebarOpen: !isLeftOpen
+      isLeftSidebarOpen: !isLeftOpen,
     });
   }, [isLeftOpen]);
   const toggleRightSidebar = React.useCallback(() => {
     setAppUIState({
-      isRightSidebarOpen: !isRightOpen
+      isRightSidebarOpen: !isRightOpen,
     });
   }, [isRightOpen]);
 

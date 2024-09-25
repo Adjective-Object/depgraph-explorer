@@ -38,7 +38,7 @@ const getQueryParams = (store: RootStore): URLSearchParams => {
  */
 
 let lastQueryParams: URLSearchParams = new URLSearchParams(
-  window.location.search
+  window.location.search,
 );
 lastQueryParams.sort();
 store.subscribe(() => {
@@ -51,10 +51,7 @@ store.subscribe(() => {
       window.location.host +
       window.location.pathname +
       "?" +
-      currentParams
-        .toString()
-        .replace(/=&/g, "&")
-        .replace(/=$/g, "");
+      currentParams.toString().replace(/=&/g, "&").replace(/=$/g, "");
     window.history.pushState(null, document.title, newLocation);
   }
 });

@@ -8,14 +8,15 @@ const ToggleArrow = ({
   isClosed,
   onClick,
   className,
-  children
+  children,
 }: React.PropsWithChildren<{
   isClosed: boolean;
   onClick?: () => void;
   className?: ArgsOf<typeof classNames>;
 }>) => (
   <button className={classNames("ToggleArrow", className)} onClick={onClick}>
-    {isClosed ? "▲" : "▼"}{children}
+    {isClosed ? "▲" : "▼"}
+    {children}
   </button>
 );
 export default ToggleArrow;

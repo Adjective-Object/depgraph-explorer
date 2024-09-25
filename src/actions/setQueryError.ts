@@ -4,10 +4,10 @@ import { Query } from "../utils/Query";
 
 export const setQueryError = (
   forQuery: Query,
-  errorMessage: string
+  errorMessage: string,
 ): SetQueryErrorAction =>
   dispatch({
     type: "SET_QUERY_ERROR",
     forQuery,
-    errorMessage
+    errorMessage,
   });

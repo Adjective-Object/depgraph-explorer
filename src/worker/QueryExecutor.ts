@@ -1,16 +1,16 @@
 import {
   BothBundleStats,
   ModuleGraphNode,
-  ModuleGraph
+  ModuleGraph,
 } from "../reducers/schema";
 import { Query } from "../utils/Query";
 
 const traverseGraph = (
   startingNodes: ModuleGraphNode[],
-  getSucessors: (node: ModuleGraphNode) => ModuleGraphNode[]
+  getSucessors: (node: ModuleGraphNode) => ModuleGraphNode[],
 ) => {
   const visitedIds = new Set();
-  startingNodes.forEach(node => visitedIds.add(node.id));
+  startingNodes.forEach((node) => visitedIds.add(node.id));
 
   const frontier: ModuleGraphNode[] = startingNodes.slice();
   const result: ModuleGraphNode[] = [];
@@ -26,8 +26,8 @@ const traverseGraph = (
 
     // add successors to frontier
     getSucessors(current)
-      .filter(node => !visitedIds.has(node.id))
-      .forEach(node => frontier.unshift(node));
+      .filter((node) => !visitedIds.has(node.id))
+      .forEach((node) => frontier.unshift(node));
   }
 
   return result;
@@ -35,18 +35,18 @@ const traverseGraph = (
 
 const fileNamePathToRegex = (
   fileName: string,
-  options: { caseSensitive: boolean }
+  options: { caseSensitive: boolean },
 ): RegExp => {
   const splitOnStar = fileName.split(/\*/g);
   return new RegExp(
     splitOnStar.join(".*"),
-    options.caseSensitive ? undefined : "i"
+    options.caseSensitive ? undefined : "i",
   );
 };
 
 function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
   var _intersection = new Set<T>();
-  setB.forEach(elem => {
+  setB.forEach((elem) => {
     if (setA.has(elem)) {
       _intersection.add(elem);
     }
@@ -57,58 +57,58 @@ function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
 const applyQuery = (
   bothGraphs: BothBundleStats,
   graph: ModuleGraph,
-  query: Query
+  query: Query,
 ): ModuleGraphNode[] => {
   switch (query.type) {
     case "FILENAME":
       const filterRegex = fileNamePathToRegex(query.fileName, {
-        caseSensitive: query.caseSensitive
+        caseSensitive: query.caseSensitive,
       });
-      return Object.values(graph).filter(node => {
+      return Object.values(graph).filter((node) => {
         return filterRegex.exec(node.name);
       });
     case "INCLUDES":
       const innerIncludeQueryResults = applyQuery(
         bothGraphs,
         graph,
-        query.target
+        query.target,
       );
-      return traverseGraph(innerIncludeQueryResults, node =>
+      return traverseGraph(innerIncludeQueryResults, (node) =>
         (node.reasons || node.dependants).map(
-          parentNodeName => graph[parentNodeName]
-        )
+          (parentNodeName) => graph[parentNodeName],
+        ),
       );
     case "INCLUDEDBY":
       const innerIncludedByQueryResults = applyQuery(
         bothGraphs,
         graph,
-        query.target
+        query.target,
       );
-      return traverseGraph(innerIncludedByQueryResults, node =>
+      return traverseGraph(innerIncludedByQueryResults, (node) =>
         (node.reasonChildren || node.dependencies).map(
-          childNodeName => graph[childNodeName]
-        )
+          (childNodeName) => graph[childNodeName],
+        ),
       );
     case "AND":
       const andLeftNames = applyQuery(bothGraphs, graph, query.left).map(
-        node => node.name
+        (node) => node.name,
       );
       const andRightNames = applyQuery(bothGraphs, graph, query.right).map(
-        node => node.name
+        (node) => node.name,
       );
       return Array.from(
-        intersection(new Set(andLeftNames), new Set(andRightNames))
-      ).map(name => graph[name]);
+        intersection(new Set(andLeftNames), new Set(andRightNames)),
+      ).map((name) => graph[name]);
     case "OR":
       const orLeftNames = applyQuery(bothGraphs, graph, query.left).map(
-        node => node.name
+        (node) => node.name,
       );
       const orRightNames = applyQuery(bothGraphs, graph, query.right).map(
-        node => node.name
+        (node) => node.name,
       );
       // use set for uniqueness
       return Array.from(new Set(orLeftNames.concat(orRightNames))).map(
-        name => graph[name]
+        (name) => graph[name],
       );
     case "ADDED":
       const newNames = new Set(Object.keys(bothGraphs.pullRequestGraph));
@@ -116,7 +116,7 @@ const applyQuery = (
         newNames.delete(name);
       }
       return Array.from(newNames)
-        .map(name => graph[name])
+        .map((name) => graph[name])
         .filter(Boolean);
     case "REMOVED":
       const oldNames = new Set(Object.keys(bothGraphs.baselineGraph));
@@ -125,18 +125,18 @@ const applyQuery = (
         oldNames.delete(name);
       }
       return Array.from(oldNames)
-        .map(name => graph[name])
+        .map((name) => graph[name])
         .filter(Boolean);
     case "CHANGED":
       return Object.keys(graph)
         .filter(
-          nodeName =>
+          (nodeName) =>
             bothGraphs.pullRequestGraph[nodeName] === undefined ||
             bothGraphs.baselineGraph[nodeName] === undefined ||
             bothGraphs.pullRequestGraph[nodeName].size !=
-            bothGraphs.baselineGraph[nodeName].size
+              bothGraphs.baselineGraph[nodeName].size,
         )
-        .map(key => graph[key]);
+        .map((key) => graph[key]);
     case "INTERPOLATE":
       return (() => {
         console.log("starting interpolation");
@@ -144,25 +144,25 @@ const applyQuery = (
         const queryToInterpolateResults = applyQuery(
           bothGraphs,
           graph,
-          query.innerQuery
+          query.innerQuery,
         );
         const originalNodeNames = new Set(
-          queryToInterpolateResults.map(x => x.name)
+          queryToInterpolateResults.map((x) => x.name),
         );
         console.log("getting union of all parents");
         const unionOfAllParents = new Set<string>();
         const parentsToOriginalNode = new Map<string, Set<string>>();
         for (let node of queryToInterpolateResults) {
           console.log("traverse from", node.name);
-          traverseGraph([node], node =>
+          traverseGraph([node], (node) =>
             (node.reasons || node.dependants)
-              .map(parentNodeName => graph[parentNodeName])
+              .map((parentNodeName) => graph[parentNodeName])
               .filter(
-                node =>
+                (node) =>
                   // do not ascend through other nodes in the starting set
-                  !originalNodeNames.has(node.name)
-              )
-          ).forEach(parent => {
+                  !originalNodeNames.has(node.name),
+              ),
+          ).forEach((parent) => {
             unionOfAllParents.add(parent.name);
             if (!parentsToOriginalNode.has(parent.name)) {
               parentsToOriginalNode.set(parent.name, new Set());
@@ -178,10 +178,10 @@ const applyQuery = (
           console.log("traverse from", startingNode.name);
           const descendantsInUnion = traverseGraph(
             [startingNode],
-            currentChildNode =>
+            (currentChildNode) =>
               (currentChildNode.reasonChildren || currentChildNode.dependencies)
-                .filter(childName => unionOfAllParents.has(childName))
-                .filter(childName => {
+                .filter((childName) => unionOfAllParents.has(childName))
+                .filter((childName) => {
                   const inParentSetsOf = parentsToOriginalNode.get(childName);
                   return (
                     // do not descend through other nodes in the starting set
@@ -196,21 +196,23 @@ const applyQuery = (
                     )
                   );
                 })
-                .map(childNodeName => graph[childNodeName])
+                .map((childNodeName) => graph[childNodeName]),
           );
-          descendantsInUnion.forEach(descendant => result.add(descendant.name));
+          descendantsInUnion.forEach((descendant) =>
+            result.add(descendant.name),
+          );
         }
 
         console.log("got resulting nodes", result);
 
-        return Array.from(result).map(name => graph[name]);
+        return Array.from(result).map((name) => graph[name]);
       })();
     case "NOT":
       const notQueryInnerResultNames = new Set<string>(
-        applyQuery(bothGraphs, graph, query.innerQuery).map(x => x.name)
+        applyQuery(bothGraphs, graph, query.innerQuery).map((x) => x.name),
       );
       return Object.values(graph).filter(
-        node => !notQueryInnerResultNames.has(node.name)
+        (node) => !notQueryInnerResultNames.has(node.name),
       );
   }
 };
@@ -235,14 +237,14 @@ export class QueryExecutor {
     }
 
     const toGraph = (data: ModuleGraphNode[]) =>
-      Object.fromEntries(data.map(x => [x.name, x]));
+      Object.fromEntries(data.map((x) => [x.name, x]));
     const queriedData: BothBundleStats = {
       baselineGraph: toGraph(
-        applyQuery(this.bundleData, this.bundleData.baselineGraph, query)
+        applyQuery(this.bundleData, this.bundleData.baselineGraph, query),
       ),
       pullRequestGraph: toGraph(
-        applyQuery(this.bundleData, this.bundleData.pullRequestGraph, query)
-      )
+        applyQuery(this.bundleData, this.bundleData.pullRequestGraph, query),
+      ),
     };
     return queriedData;
   }

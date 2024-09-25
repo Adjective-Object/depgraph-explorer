@@ -4,5 +4,5 @@ import { dispatch } from "../store";
 export const setFilterText = (newFilter: string): SetFilterTextAction =>
   dispatch({
     type: "SET_FILTER_TEXT",
-    newFilter
+    newFilter,
   });

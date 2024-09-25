@@ -14,7 +14,7 @@ interface FileLoader {
 
 const FileLoaderView = ({
   fileLoader,
-  children
+  children,
 }: {
   fileLoader: FileLoader;
   children?: React.ReactChild;
@@ -70,14 +70,14 @@ const useFileLoader = () => {
         fileReader && setLoadError(fileReader.error);
       };
     },
-    []
+    [],
   );
 
   return {
     isLoading,
     fileContent,
     onChange,
-    loadError
+    loadError,
   };
 };
 
@@ -87,7 +87,7 @@ const BundleLoaderView = () => {
 
   const isUninitialized = useSelector(
     (store: RootStore) =>
-      store.bundleData.initializationState.type === "UNINITIALIZED"
+      store.bundleData.initializationState.type === "UNINITIALIZED",
   );
 
   React.useEffect(() => {
@@ -98,10 +98,10 @@ const BundleLoaderView = () => {
 
   const useDemoData = React.useCallback(() => {
     let u = new URL(window.location.toString());
-    u.search = ""
-    u.hash = ""
-    u.pathname += "/demo-stats.json"
-    setBundleSource(u.toString() );
+    u.search = "";
+    u.hash = "";
+    u.pathname += "/demo-stats.json";
+    setBundleSource(u.toString());
   }, []);
 
   return (

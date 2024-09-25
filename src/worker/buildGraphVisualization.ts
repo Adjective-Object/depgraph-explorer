@@ -6,7 +6,7 @@ import {
   BothBundleStats,
   GeneratedGraphData,
   ModuleGraphNode,
-  ModuleGraph
+  ModuleGraph,
 } from "../reducers/schema";
 
 import { formatByteSize, formatByteSizeChange } from "../utils/formatByteSize";
@@ -21,7 +21,7 @@ const getReasonChildren = (maybeNode: ModuleGraphNode | undefined) =>
 
 const getNodeId = (
   oldGraphNode: ModuleGraphNode | undefined,
-  newGraphNode: ModuleGraphNode | undefined
+  newGraphNode: ModuleGraphNode | undefined,
 ): string => {
   if (oldGraphNode) {
     return `old-${oldGraphNode.id}`;
@@ -36,7 +36,7 @@ const getOutgoingEdges = (
   filteredBundleStats: BothBundleStats,
   oldGraphNode: ModuleGraphNode,
   newGraphNode: ModuleGraphNode,
-  getEdgeTargets: (maybeNode: ModuleGraphNode | undefined) => string[]
+  getEdgeTargets: (maybeNode: ModuleGraphNode | undefined) => string[],
 ): Vis.Edge[] => {
   const oldEdgeTargets: Set<string> = new Set(getEdgeTargets(oldGraphNode));
   const newEdgeTargets: Set<string> = new Set(getEdgeTargets(newGraphNode));
@@ -46,7 +46,7 @@ const getOutgoingEdges = (
   const fromNodeId: string = getNodeId(oldGraphNode, newGraphNode);
   const edges: Vis.Edge[] = [];
 
-  allDependencies.forEach(dependencyName => {
+  allDependencies.forEach((dependencyName) => {
     const oldDependencyNode = filteredBundleStats.baselineGraph[dependencyName];
     const newDependencyNode =
       filteredBundleStats.pullRequestGraph[dependencyName];
@@ -61,7 +61,7 @@ const getOutgoingEdges = (
       from: fromNodeId,
       to: dependencyId,
       color: inNew && inOld ? "#000" : inNew ? BAD_COLOR : GOOD_COLOR,
-      id: md5(`${fromNodeId}-->${dependencyId}`)
+      id: md5(`${fromNodeId}-->${dependencyId}`),
     });
   });
 
@@ -133,15 +133,15 @@ const palette = new Palette([
   "#00FCFC",
   "#F8D8F8",
   "#000000",
-  "#000000"
+  "#000000",
 ]);
 
 const union = <T>(setA: Set<T>, setB: Set<T>): Set<T> => {
   var _union = new Set<T>();
-  setA.forEach(elem => {
+  setA.forEach((elem) => {
     _union.add(elem);
   });
-  setB.forEach(elem => {
+  setB.forEach((elem) => {
     _union.add(elem);
   });
   return _union;
@@ -153,12 +153,12 @@ const uniq = <T>(a: T[]) => {
 
 export function buildGraphVisualization(
   filteredBundleStats: BothBundleStats,
-  fullBundleStats: BothBundleStats
+  fullBundleStats: BothBundleStats,
 ): GeneratedGraphData {
   const allNodeNames = uniq(
     Object.keys(filteredBundleStats.baselineGraph).concat(
-      Object.keys(filteredBundleStats.pullRequestGraph)
-    )
+      Object.keys(filteredBundleStats.pullRequestGraph),
+    ),
   );
 
   const nodes: (Vis.Node & Pick<Required<Vis.Node>, "id">)[] = [];
@@ -188,7 +188,7 @@ export function buildGraphVisualization(
 
     const wasHoisted = (
       node: ModuleGraphNode | undefined,
-      graph: ModuleGraph
+      graph: ModuleGraph,
     ) =>
       node &&
       node.parents.length === 1 &&
@@ -207,10 +207,11 @@ export function buildGraphVisualization(
     }
 
     const nodeSize: string = !!(oldGraphNode && newGraphNode)
-      ? `${formatByteSize(newGraphNode.size)}${newGraphNode.size === oldGraphNode.size
-        ? ""
-        : ", " + formatByteSizeChange(newGraphNode.size - oldGraphNode.size)
-      }`
+      ? `${formatByteSize(newGraphNode.size)}${
+          newGraphNode.size === oldGraphNode.size
+            ? ""
+            : ", " + formatByteSizeChange(newGraphNode.size - oldGraphNode.size)
+        }`
       : oldGraphNode
         ? `${formatByteSize(oldGraphNode.size)}`
         : `${formatByteSize(newGraphNode.size)}`;
@@ -228,22 +229,22 @@ export function buildGraphVisualization(
         border: borderColor,
         highlight: {
           background: nodeColor,
-          border: borderColor
-        }
+          border: borderColor,
+        },
       },
       scaling: {
-        max: 1000
+        max: 1000,
       },
       font: {
-        size: addedOrRemoved || isRootNode ? 18 : 14
+        size: addedOrRemoved || isRootNode ? 18 : 14,
       },
       margin: {
         top: 10,
         bottom: 10,
         left: 10,
-        right: 10
+        right: 10,
       },
-      borderWidth: addedOrRemoved || isRootNode ? 2 : 1
+      borderWidth: addedOrRemoved || isRootNode ? 2 : 1,
     };
 
     if (isRootNode) {
@@ -258,7 +259,7 @@ export function buildGraphVisualization(
       filteredBundleStats,
       oldGraphNode,
       newGraphNode,
-      getDependencies
+      getDependencies,
     );
     thisNodeDependencyEdges.forEach((x: Vis.Edge) => dependencyEdges.push(x));
 
@@ -266,10 +267,10 @@ export function buildGraphVisualization(
       filteredBundleStats,
       oldGraphNode,
       newGraphNode,
-      getReasonChildren
+      getReasonChildren,
     );
     thisNodeReasonChildrenEdges.forEach((x: Vis.Edge) =>
-      reasonChildrenEdges.push(x)
+      reasonChildrenEdges.push(x),
     );
   }
 

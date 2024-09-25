@@ -11,5 +11,5 @@ export const rootReducer = combineReducers<RootStore, AppAction>({
   query: queryReducer,
   graphOptions: graphOptionsReducer,
   appUIState: appUIReducer,
-  tutorials: tutorialReducer
+  tutorials: tutorialReducer,
 });

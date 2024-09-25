@@ -1,8 +1,5 @@
 import { Query } from "../utils/Query";
-import {
-  BundleSizeSummary,
-  GeneratedGraphData
-} from "../reducers/schema";
+import { BundleSizeSummary, GeneratedGraphData } from "../reducers/schema";
 
 export interface InitStoreFromUrlRequestMessage {
   type: "INIT_STORE_FROM_URL";

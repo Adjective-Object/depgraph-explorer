@@ -13,7 +13,7 @@ const PendingInitialLoad = () => (
 
 const InitialLoadFailed = ({
   bundleData,
-  errorMessage
+  errorMessage,
 }: {
   bundleData: InitializedBundleDataState;
   errorMessage: string;
@@ -65,7 +65,7 @@ const QueryErrorMessage = ({ message }: { message: string }) => (
 const GraphViewTooLarge = ({
   limit,
   size,
-  showAnywayCallback
+  showAnywayCallback,
 }: {
   limit: number;
   size: number;
@@ -92,7 +92,7 @@ const GraphView = () => {
     isPending,
     numNodes,
     shouldShowReasonEdges,
-    queryResult
+    queryResult,
   } = useSelector((store: RootStore) => ({
     bundleData: store.bundleData,
     isPending:
@@ -101,10 +101,10 @@ const GraphView = () => {
     numNodes: Number(
       isQuerySuccess(store.query.queryResult) &&
         store.query.queryResult.data.nodes &&
-        store.query.queryResult.data.nodes.length
+        store.query.queryResult.data.nodes.length,
     ),
     shouldShowReasonEdges: store.graphOptions.shouldShowReasonEdges,
-    queryResult: store.query.queryResult
+    queryResult: store.query.queryResult,
   }));
 
   const [showAnyway, setShowAnyway] = React.useState(false);
@@ -126,7 +126,7 @@ const GraphView = () => {
       nodes: queryResult.data.nodes,
       edges: shouldShowReasonEdges
         ? queryResult.data.reasonChildrenEdges
-        : queryResult.data.dependencyEdges
+        : queryResult.data.dependencyEdges,
     };
   }, [queryResult, shouldShowReasonEdges]);
 

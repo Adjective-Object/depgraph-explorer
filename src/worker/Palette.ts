@@ -11,7 +11,7 @@ export class Palette {
     if (!this.assignedColors.has(name)) {
       this.assignedColors.set(
         name,
-        this.palette[this.colorCounter++ % this.palette.length]
+        this.palette[this.colorCounter++ % this.palette.length],
       );
     }
     return this.assignedColors.get(name);

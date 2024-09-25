@@ -24,7 +24,7 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
   const containerRef = React.useRef<HTMLElement | null>(null);
   const configContainerRef = React.useRef<HTMLElement | null>(null);
   const { isHierarchical, shouldStabilize } = useSelector(
-    (store: RootStore) => store.graphOptions
+    (store: RootStore) => store.graphOptions,
   );
   const [loadingPercent, setLoadingPercent] = React.useState(0);
   const [isLoaded, setIsLoaded] = React.useState(!shouldStabilize);
@@ -45,31 +45,31 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
       configure: {
         enabled: true,
         showButton: true,
-        container: configContainerRef.current
+        container: configContainerRef.current,
       },
       physics: {
         stabilization: {
           enabled: shouldStabilize,
-          updateInterval
-        }
+          updateInterval,
+        },
       },
       layout: {
         randomSeed: 191006,
         improvedLayout: false,
         hierarchical: {
           enabled: isHierarchical,
-          sortMethod: "directed"
-        }
+          sortMethod: "directed",
+        },
       },
       nodes: {
         shape: "box",
         shapeProperties: {
-          borderRadius: 1
-        }
+          borderRadius: 1,
+        },
       },
       edges: {
-        arrows: "to"
-      }
+        arrows: "to",
+      },
     };
     console.log("mount vis network", containerRef.current, options);
     console.log("nodes:", graphData.nodes && graphData.nodes.length);
@@ -82,7 +82,7 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
 
     if (shouldStabilize) {
       setIsLoaded(false);
-      network.on("stabilizationProgress", params => {
+      network.on("stabilizationProgress", (params) => {
         const percent = (params.iterations / params.total) * 100;
         setLoadingPercent(percent);
       });
@@ -105,7 +105,7 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
       </button>
       <section
         className={classNames("VisGraph-config-container", {
-          "VisGraph-open": isConfigOpen
+          "VisGraph-open": isConfigOpen,
         })}
         ref={configContainerRef}
       />

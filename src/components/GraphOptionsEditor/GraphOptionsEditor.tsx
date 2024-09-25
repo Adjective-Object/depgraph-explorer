@@ -5,34 +5,31 @@ import { RootStore } from "../../reducers/schema";
 import { setGraphOptions } from "../../actions/setGraphOptions";
 
 const GraphOptionsEditor = () => {
-  const {
-    isHierarchical,
-    shouldStabilize,
-    shouldShowReasonEdges
-  } = useSelector((store: RootStore) => store.graphOptions);
+  const { isHierarchical, shouldStabilize, shouldShowReasonEdges } =
+    useSelector((store: RootStore) => store.graphOptions);
   const setIsHierarchicalFromCheckbox = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGraphOptions({
-        isHierarchical: !!e.currentTarget.checked
+        isHierarchical: !!e.currentTarget.checked,
       });
     },
-    []
+    [],
   );
   const setShouldStabilizeFromCheckbox = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGraphOptions({
-        shouldStabilize: !!e.currentTarget.checked
+        shouldStabilize: !!e.currentTarget.checked,
       });
     },
-    []
+    [],
   );
   const setShouldShowReasonEdgesFromCheckbox = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGraphOptions({
-        shouldShowReasonEdges: !!e.currentTarget.checked
+        shouldShowReasonEdges: !!e.currentTarget.checked,
       });
     },
-    []
+    [],
   );
 
   return (

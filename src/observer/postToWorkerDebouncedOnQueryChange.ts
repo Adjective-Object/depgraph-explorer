@@ -17,7 +17,7 @@ store.subscribe(() => {
     if (currentCompilation && !isCompilationError(currentCompilation)) {
       debouncedPostMessage({
         type: "QUERY_REQUEST",
-        query: currentCompilation.query
+        query: currentCompilation.query,
       });
     }
   }
@@ -25,5 +25,5 @@ store.subscribe(() => {
 
 const debouncedPostMessage = debounce(
   (message: PerformQueryRequestMessage) => appWorker.postMessage(message),
-  300
+  300,
 );

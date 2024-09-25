@@ -1,7 +1,7 @@
 import {
   BothBundleStats,
   BundleSizeSummary,
-  SizeSummary
+  SizeSummary,
 } from "../reducers/schema";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 
@@ -10,14 +10,14 @@ const uniq = <T>(a: T[]) => {
 };
 
 export const getBundleSizeSummary = (
-  resultGraph: BothBundleStats
+  resultGraph: BothBundleStats,
 ): BundleSizeSummary => {
   const packages: { [key: string]: SizeSummary } = {};
 
   const allNodeNames = uniq(
     Object.keys(resultGraph.baselineGraph).concat(
-      Object.keys(resultGraph.pullRequestGraph)
-    )
+      Object.keys(resultGraph.pullRequestGraph),
+    ),
   );
 
   const ensurePackage = (name: string) => {
@@ -27,7 +27,7 @@ export const getBundleSizeSummary = (
         numFilesAfter: 0,
         numFilesDelta: 0,
         totalBytesAfter: 0,
-        totalBytesDelta: 0
+        totalBytesDelta: 0,
       };
     }
     return packages[packageName];
@@ -56,7 +56,7 @@ export const getBundleSizeSummary = (
     numFilesAfter: 0,
     numFilesDelta: 0,
     totalBytesAfter: 0,
-    totalBytesDelta: 0
+    totalBytesDelta: 0,
   };
 
   for (let packageName in packages) {

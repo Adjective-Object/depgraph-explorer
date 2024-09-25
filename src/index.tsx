@@ -8,7 +8,7 @@ import App from "./App";
 import {
   InitStoreFromUrlRequestMessage,
   WorkerToAppMessage,
-  InitStoreFromMultiUrlRequestMessage
+  InitStoreFromMultiUrlRequestMessage,
 } from "./worker/messages";
 import { markBundleDataInitialized } from "./actions/markBundleDataInitialized";
 import { setQueryResult } from "./actions/setQueryResult";
@@ -43,7 +43,7 @@ appWorker.onmessage = function (e: MessageEvent): void {
       if (compResult && compResult.type === "CompilationSuccess") {
         appWorker.postMessage({
           type: "QUERY_REQUEST",
-          query: compResult.query
+          query: compResult.query,
         });
       }
       break;
@@ -54,7 +54,7 @@ appWorker.onmessage = function (e: MessageEvent): void {
       setQueryResult(
         messageData.forQuery,
         messageData.result,
-        messageData.summary
+        messageData.summary,
       );
       break;
     case "QUERY_ERROR":
@@ -74,11 +74,11 @@ if (initialQueryString) {
 }
 setGraphOptions({
   isHierarchical: !!urlParams.has("hi"),
-  shouldStabilize: !!urlParams.has("stab")
+  shouldStabilize: !!urlParams.has("stab"),
 });
 setAppUIState({
   isLeftSidebarOpen: !(urlParams.has("lc") || window.innerWidth < 1000),
-  isRightSidebarOpen: !urlParams.has("rc")
+  isRightSidebarOpen: !urlParams.has("rc"),
 });
 
 // Init bundle data form URL params
@@ -90,7 +90,7 @@ if (bundleDataSingleUrl) {
   setBundleSource(bundleDataSingleUrl);
   const initStoreMessage: InitStoreFromUrlRequestMessage = {
     type: "INIT_STORE_FROM_URL",
-    payloadUrl: bundleDataSingleUrl
+    payloadUrl: bundleDataSingleUrl,
   };
   appWorker.postMessage(initStoreMessage);
 } else if (bundleDataPrUrl && bundleDataBaselineUrl) {
@@ -98,22 +98,23 @@ if (bundleDataSingleUrl) {
   const initStoreMessage: InitStoreFromMultiUrlRequestMessage = {
     type: "INIT_STORE_FROM_MULTI_URL",
     prUrl: bundleDataPrUrl,
-    baselineUrl: bundleDataBaselineUrl
+    baselineUrl: bundleDataBaselineUrl,
   };
   appWorker.postMessage(initStoreMessage);
 }
 
 // fetch the tutorial
 fetch("./tutorial_examples.json")
-  .then(r => r.json())
-  .then(tutorials => setTutorials(tutorials))
-  .catch(e => setTutorials(defaultTutorials));
+  .then((r) => r.json())
+  .then((tutorials) => setTutorials(tutorials))
+  .catch((e) => setTutorials(defaultTutorials));
 
 ///////////////////
 // Mount the app //
 ///////////////////
 const rootContainer = createRoot(document.getElementById("root")!);
-rootContainer.render(<Provider store={store} >
-  <App />
-</Provider >,
+rootContainer.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
 );

@@ -1,23 +1,23 @@
 import {
   CompilationResult,
-  CompilationSuccess
+  CompilationSuccess,
 } from "../grammar/compilationTypes";
 import { Query } from "../utils/Query";
 import * as Vis from "vis-network";
 
 import {
   ModuleGraphNodeWithChildren,
-  ModuleGraphWithChildren
+  ModuleGraphWithChildren,
 } from "webpack-bundle-diff-add-children";
 import {
   ModuleGraphNodeWithReasons,
-  ModuleGraphWithReasons
+  ModuleGraphWithReasons,
 } from "webpack-bundle-diff-add-reasons";
 
 export type ModuleGraph =
   | ModuleGraphWithReasons<
-    ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
-  >
+      ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
+    >
   | ModuleGraphWithChildren;
 
 export type ModuleGraphNode = ModuleGraphNodeWithChildren &
@@ -30,16 +30,16 @@ export interface BothBundleStats {
 
 export interface InitializedBundleDataState {
   initializationState:
-  | { type: "INITIALIZING" }
-  | { type: "INITIALIZED" }
-  | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
+    | { type: "INITIALIZING" }
+    | { type: "INITIALIZED" }
+    | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
   bundleSource:
-  | {
-    type: "SINGLE_URL";
-    bundleSourceUrl: string;
-  }
-  | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
-  | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
+    | {
+        type: "SINGLE_URL";
+        bundleSourceUrl: string;
+      }
+    | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
+    | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
 }
 export interface UninitializedBundleDataState {
   initializationState: { type: "UNINITIALIZED" };

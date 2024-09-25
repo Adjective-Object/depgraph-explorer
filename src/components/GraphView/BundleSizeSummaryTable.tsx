@@ -6,7 +6,7 @@ import "./BundleSizeSummaryTable.css";
 import {
   formatByteSize,
   formatByteSizeChange,
-  formatCountChange
+  formatCountChange,
 } from "../../utils/formatByteSize";
 import { GOOD_COLOR, BAD_COLOR } from "../../utils/colors";
 
@@ -16,17 +16,17 @@ const styleForDeltaCell = (x: number): React.CSSProperties => {
   const targetColor = percent < 0 ? GOOD_COLOR : BAD_COLOR;
   const color = targetColor.replace(
     /1\)$/,
-    Math.abs(1 - Math.pow(1 - percent, 3)).toString()
+    Math.abs(1 - Math.pow(1 - percent, 3)).toString(),
   );
   return {
-    backgroundColor: color
+    backgroundColor: color,
   };
 };
 
 const BundleSizeSummaryTableRow = ({
   name,
   size,
-  className
+  className,
 }: {
   name: string;
   size: SizeSummary;
@@ -49,7 +49,7 @@ export const BundleSizeSummaryTable = () => {
   const summary = useSelector((store: RootStore) =>
     isQuerySuccess(store.query.queryResult)
       ? store.query.queryResult.summary
-      : null
+      : null,
   );
   return summary == null ? null : (
     <section className="BundleSizeSummary-container">
@@ -71,35 +71,35 @@ export const BundleSizeSummaryTable = () => {
             .sort(
               (
                 [, size1]: [string, SizeSummary],
-                [, size2]: [string, SizeSummary]
+                [, size2]: [string, SizeSummary],
               ) => {
                 return (
                   Math.abs(size2.totalBytesAfter) -
                   Math.abs(size1.totalBytesAfter)
                 );
-              }
+              },
             )
             .sort(
               (
                 [, size1]: [string, SizeSummary],
-                [, size2]: [string, SizeSummary]
+                [, size2]: [string, SizeSummary],
               ) => {
                 return (
                   Math.abs(size2.totalBytesAfter) -
                   Math.abs(size1.totalBytesAfter)
                 );
-              }
+              },
             )
             .sort(
               (
                 [, size1]: [string, SizeSummary],
-                [, size2]: [string, SizeSummary]
+                [, size2]: [string, SizeSummary],
               ) => {
                 return (
                   Math.abs(size2.totalBytesDelta) -
                   Math.abs(size1.totalBytesDelta)
                 );
-              }
+              },
             )
             .map(([name, size]: [string, SizeSummary]) => (
               <BundleSizeSummaryTableRow key={name} name={name} size={size} />

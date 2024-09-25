@@ -11,7 +11,7 @@ const CompilationError = ({ message }: { message: string }) => (
 
 const QueryPermalink = () => {
   const { text } = useSelector((store: RootStore) => ({
-    text: store.query.currentFilterText
+    text: store.query.currentFilterText,
   }));
 
   const location =
@@ -32,14 +32,14 @@ const QueryPermalink = () => {
 const QueryEditor = () => {
   const { text, compilationResult } = useSelector((store: RootStore) => ({
     text: store.query.currentFilterText,
-    compilationResult: store.query.compilationResult
+    compilationResult: store.query.compilationResult,
   }));
 
   const writeOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setFilterText(e.target.value);
     },
-    []
+    [],
   );
 
   return (

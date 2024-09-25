@@ -14,12 +14,12 @@ const semantics = filterGrammar.createSemantics().addOperation("getQueryTree", {
     _space1: any,
     _op: any,
     _space2: any,
-    right: any
+    right: any,
   ): Query => {
     return {
       type: "AND",
       left: left.getQueryTree(),
-      right: right.getQueryTree()
+      right: right.getQueryTree(),
     };
   },
   OrExp: (
@@ -27,12 +27,12 @@ const semantics = filterGrammar.createSemantics().addOperation("getQueryTree", {
     _space1: any,
     _op: any,
     _space2: any,
-    right: any
+    right: any,
   ): Query => {
     return {
       type: "OR",
       left: left.getQueryTree(),
-      right: right.getQueryTree()
+      right: right.getQueryTree(),
     };
   },
   PrimExp: (e: any): Query => {
@@ -43,44 +43,44 @@ const semantics = filterGrammar.createSemantics().addOperation("getQueryTree", {
     _space1: any,
     inner: any,
     _space2: any,
-    _rparn: any
+    _rparn: any,
   ): Query => {
     return inner.getQueryTree();
   },
   IncludedByExp: (_includeToken: any, _space1: any, e: any): Query => {
     return {
       type: "INCLUDEDBY",
-      target: e.getQueryTree()
+      target: e.getQueryTree(),
     };
   },
   IncludesExp: (_includeToken: any, _space1: any, e: any): Query => {
     return {
       type: "INCLUDES",
-      target: e.getQueryTree()
+      target: e.getQueryTree(),
     };
   },
   InterpolateExp: (_interpolateToken: any, innerExpression: any): Query => {
     return {
       type: "INTERPOLATE",
-      innerQuery: innerExpression.getQueryTree()
+      innerQuery: innerExpression.getQueryTree(),
     };
   },
   NotExp: (_interpolateToken: any, innerExpression: any): Query => {
     return {
       type: "NOT",
-      innerQuery: innerExpression.getQueryTree()
+      innerQuery: innerExpression.getQueryTree(),
     };
   },
   pathLiteral: (
     _quoteOpen: any,
     body: any,
     _quoteClose: any,
-    caseSensitiveToken: any
+    caseSensitiveToken: any,
   ): Query => {
     return {
       type: "FILENAME",
       caseSensitive: caseSensitiveToken.sourceString === "!",
-      fileName: body.sourceString
+      fileName: body.sourceString,
     };
   },
   specialCaseLiteral: (specialToken: any): Query => {
@@ -91,13 +91,13 @@ const semantics = filterGrammar.createSemantics().addOperation("getQueryTree", {
       literalType !== "REMOVED"
     ) {
       throw new Error(
-        `specialCaseLiteral had token "${literalType}", not one of ADDED/CHANGED/REMOVED`
+        `specialCaseLiteral had token "${literalType}", not one of ADDED/CHANGED/REMOVED`,
       );
     }
     return {
-      type: literalType
+      type: literalType,
     };
-  }
+  },
 });
 
 export const parseFilterStringToQuery = (input: string): CompilationResult => {
@@ -107,10 +107,10 @@ export const parseFilterStringToQuery = (input: string): CompilationResult => {
   return match.succeeded()
     ? {
         type: "CompilationSuccess",
-        query: semantics(match).getQueryTree()
+        query: semantics(match).getQueryTree(),
       }
     : {
         type: "CompilationError",
-        message: match.message || ""
+        message: match.message || "",
       };
 };

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import "./QueryExamples.css";
 import { setFilterText } from "../../actions/setFilterText";
 import useToggle from "../../hooks/useToggle";
@@ -8,7 +8,7 @@ import { RootStore } from "../../reducers/schema";
 
 const QueryExamplesExample = ({
   exampleName,
-  exampleBody
+  exampleBody,
 }: {
   exampleName: string;
   exampleBody: string;
@@ -26,15 +26,13 @@ const QueryExamplesExample = ({
 };
 
 const QueryExamplesInner = () => {
-  const tutorials = useSelector((store: RootStore) => 
-    store.tutorials
-  );
+  const tutorials = useSelector((store: RootStore) => store.tutorials);
   return (
     <>
       <p className="QueryExamples-helptext">
         Click an example to load it in the editor.
       </p>
-      {tutorials.map(example => (
+      {tutorials.map((example) => (
         <QueryExamplesExample {...example} key={example.exampleName} />
       ))}
     </>

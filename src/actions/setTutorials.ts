@@ -4,5 +4,5 @@ import { dispatch } from "../store";
 export const setTutorials = (newTutorials: Tutorial[]): SetTutorialsAction =>
   dispatch({
     type: "SET_TUTORIALS",
-    newTutorials
+    newTutorials,
   });
