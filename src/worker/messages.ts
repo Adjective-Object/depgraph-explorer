@@ -12,10 +12,15 @@ export interface InitStoreFromMultiUrlRequestMessage {
   baselineUrl: string;
 }
 
-export interface InitStoreFromBundleRequestMessage {
+export interface InitStoreFromBundlesRequestMessage {
   type: "INIT_STORE_FROM_BUNDLE_STATS_STRINGS";
   baselineString: string;
   prString: string;
+}
+
+export interface InitStoreFromBundleRequestMessage {
+  type: "INIT_STORE_FROM_BUNDLE_STATS_STRING";
+  blobString: string;
 }
 
 export interface PerformQueryRequestMessage {
@@ -46,8 +51,10 @@ export interface PerformQueryResponseErrorMessage {
 }
 
 export type AppToWorkerMessage =
+  | InitStoreFromMultiUrlRequestMessage
   | InitStoreFromUrlRequestMessage
   | InitStoreFromBundleRequestMessage
+  | InitStoreFromBundlesRequestMessage
   | PerformQueryRequestMessage;
 
 export type WorkerToAppMessage =

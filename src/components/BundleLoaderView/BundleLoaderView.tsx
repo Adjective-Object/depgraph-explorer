@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootStore } from "../../reducers/schema";
 import { setBundleBlobs } from "../../actions/setBundleBlobs";
 import { setBundleSource } from "../../actions/setBundleSource";
+import { setBundleBlob } from "../../actions/setBundleBlob";
 
 interface FileLoader {
   isLoading: boolean;
@@ -104,6 +105,17 @@ const BundleLoaderView = () => {
     setBundleSource(u.toString());
   }, []);
 
+  const useSingleGraph = React.useCallback(() => {
+    let blob = baseline.fileContent || pullRequest.fileContent || null;
+    if (!blob) {
+      return;
+    }
+
+    setBundleBlob(
+      blob,
+    )
+  }, [baseline.fileContent, pullRequest.fileContent]);
+
   return (
     <section className="BundleLoaderView-wrapper">
       <section className="BundleLoaderView-files">
@@ -113,6 +125,14 @@ const BundleLoaderView = () => {
       <button className="BundleLoaderView-demoDataButton" onClick={useDemoData}>
         Use Demo Data
       </button>
+      {
+        ((baseline.fileContent != null) != (pullRequest.fileContent != null))
+          ? <button className="BundleLoaderView-demoDataButton" onClick={useSingleGraph}>
+            Visualize single graph
+          </button>
+          : null
+
+      }
     </section>
   );
 };

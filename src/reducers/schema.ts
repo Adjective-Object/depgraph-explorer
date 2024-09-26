@@ -16,30 +16,31 @@ import {
 
 export type ModuleGraph =
   | ModuleGraphWithReasons<
-      ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
-    >
+    ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>
+  >
   | ModuleGraphWithChildren;
 
 export type ModuleGraphNode = ModuleGraphNodeWithChildren &
   Partial<ModuleGraphNodeWithReasons<ModuleGraphNodeWithChildren>>;
 
-export interface BothBundleStats {
-  baselineGraph: ModuleGraph;
-  pullRequestGraph: ModuleGraph;
+export interface BundleStats {
+  baselineGraph?: ModuleGraph;
+  graph: ModuleGraph;
 }
 
 export interface InitializedBundleDataState {
   initializationState:
-    | { type: "INITIALIZING" }
-    | { type: "INITIALIZED" }
-    | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
+  | { type: "INITIALIZING" }
+  | { type: "INITIALIZED" }
+  | { type: "INITIALIZATION_FAILURE"; errorMessage: string };
   bundleSource:
-    | {
-        type: "SINGLE_URL";
-        bundleSourceUrl: string;
-      }
-    | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
-    | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
+  | {
+    type: "SINGLE_URL";
+    bundleSourceUrl: string;
+  }
+  | { type: "MULTIPLE_BLOBS"; prBlob: string; baselineBlob: string }
+  | { type: "SINGLE_BLOB"; blob: string }
+  | { type: "MULTIPLE_URLS"; prUrl: string; baselineUrl: string };
 }
 export interface UninitializedBundleDataState {
   initializationState: { type: "UNINITIALIZED" };
@@ -134,6 +135,10 @@ export type SetBundleDataMultipleSourcesAction = {
   baselineBundleUrl: string;
   prBundleUrl: string;
 };
+export type SetBundleDataBlobAction = {
+  type: "SET_BUNDLE_DATA_BLOB";
+  blob: string;
+};
 export type SetBundleDataBlobsAction = {
   type: "SET_BUNDLE_DATA_BLOBS";
   baselineBlob: string;
@@ -143,6 +148,7 @@ export type BundleDataAction =
   | MarkBundleDataInitializedAction
   | MarkBundleDataLoadErrorAction
   | SetBundleDataSourceAction
+  | SetBundleDataBlobAction
   | SetBundleDataMultipleSourcesAction
   | SetBundleDataBlobsAction;
 

@@ -1,8 +1,9 @@
 import {
-  BothBundleStats,
   BundleSizeSummary,
+  BundleStats,
   SizeSummary,
 } from "../reducers/schema";
+import { getNodeNames } from "./buildGraphVisualization";
 import { getPackageFromFilePath } from "./getPackageFromFilePath";
 
 const uniq = <T>(a: T[]) => {
@@ -10,15 +11,11 @@ const uniq = <T>(a: T[]) => {
 };
 
 export const getBundleSizeSummary = (
-  resultGraph: BothBundleStats,
+  resultGraph: BundleStats,
 ): BundleSizeSummary => {
   const packages: { [key: string]: SizeSummary } = {};
 
-  const allNodeNames = uniq(
-    Object.keys(resultGraph.baselineGraph).concat(
-      Object.keys(resultGraph.pullRequestGraph),
-    ),
-  );
+  const allNodeNames = getNodeNames(resultGraph)
 
   const ensurePackage = (name: string) => {
     const [packageName] = getPackageFromFilePath(name);
@@ -33,22 +30,32 @@ export const getBundleSizeSummary = (
     return packages[packageName];
   };
 
-  for (let name of allNodeNames) {
-    const oldGraphNode = resultGraph.baselineGraph[name];
-    const newGraphNode = resultGraph.pullRequestGraph[name];
-    const currentPackage = ensurePackage(name);
-    if (oldGraphNode === undefined) {
-      currentPackage.numFilesDelta += 1;
-      currentPackage.totalBytesDelta += newGraphNode.size;
-      currentPackage.totalBytesAfter += newGraphNode.size;
-    } else if (newGraphNode === undefined) {
-      currentPackage.numFilesDelta -= 1;
-      currentPackage.numFilesAfter += 1;
-      currentPackage.totalBytesDelta -= oldGraphNode.size;
-    } else {
-      currentPackage.numFilesAfter += 1;
-      currentPackage.totalBytesDelta += newGraphNode.size - oldGraphNode.size;
-      currentPackage.totalBytesAfter += newGraphNode.size;
+  if (resultGraph.baselineGraph) {
+    for (let name of allNodeNames) {
+      const currentPackage = ensurePackage(name);
+      const oldGraphNode = resultGraph.baselineGraph[name];
+      const newGraphNode = resultGraph.graph[name];
+      if (oldGraphNode === undefined) {
+        currentPackage.numFilesDelta += 1;
+        currentPackage.totalBytesDelta += newGraphNode.size;
+        currentPackage.totalBytesAfter += newGraphNode.size;
+      } else if (newGraphNode === undefined) {
+        currentPackage.numFilesDelta -= 1;
+        currentPackage.numFilesAfter += 1;
+        currentPackage.totalBytesDelta -= oldGraphNode.size;
+      } else {
+        currentPackage.numFilesAfter += 1;
+        currentPackage.totalBytesDelta += newGraphNode.size - oldGraphNode.size;
+        currentPackage.totalBytesAfter += newGraphNode.size;
+      }
+    }
+  } else {
+    for (let name of allNodeNames) {
+      const currentPackage = ensurePackage(name);
+      const node = resultGraph.graph[name];
+
+      currentPackage.numFilesAfter += 1
+      currentPackage.totalBytesAfter += node.size;
     }
   }
 

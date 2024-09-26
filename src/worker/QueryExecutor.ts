@@ -1,7 +1,7 @@
 import {
-  BothBundleStats,
   ModuleGraphNode,
   ModuleGraph,
+  BundleStats,
 } from "../reducers/schema";
 import { Query } from "../utils/Query";
 
@@ -55,7 +55,7 @@ function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
 }
 
 const applyQuery = (
-  bothGraphs: BothBundleStats,
+  fullGraph: BundleStats,
   graph: ModuleGraph,
   query: Query,
 ): ModuleGraphNode[] => {
@@ -69,7 +69,7 @@ const applyQuery = (
       });
     case "INCLUDES":
       const innerIncludeQueryResults = applyQuery(
-        bothGraphs,
+        fullGraph,
         graph,
         query.target,
       );
@@ -80,7 +80,7 @@ const applyQuery = (
       );
     case "INCLUDEDBY":
       const innerIncludedByQueryResults = applyQuery(
-        bothGraphs,
+        fullGraph,
         graph,
         query.target,
       );
@@ -90,20 +90,20 @@ const applyQuery = (
         ),
       );
     case "AND":
-      const andLeftNames = applyQuery(bothGraphs, graph, query.left).map(
+      const andLeftNames = applyQuery(fullGraph, graph, query.left).map(
         (node) => node.name,
       );
-      const andRightNames = applyQuery(bothGraphs, graph, query.right).map(
+      const andRightNames = applyQuery(fullGraph, graph, query.right).map(
         (node) => node.name,
       );
       return Array.from(
         intersection(new Set(andLeftNames), new Set(andRightNames)),
       ).map((name) => graph[name]);
     case "OR":
-      const orLeftNames = applyQuery(bothGraphs, graph, query.left).map(
+      const orLeftNames = applyQuery(fullGraph, graph, query.left).map(
         (node) => node.name,
       );
-      const orRightNames = applyQuery(bothGraphs, graph, query.right).map(
+      const orRightNames = applyQuery(fullGraph, graph, query.right).map(
         (node) => node.name,
       );
       // use set for uniqueness
@@ -111,16 +111,22 @@ const applyQuery = (
         (name) => graph[name],
       );
     case "ADDED":
-      const newNames = new Set(Object.keys(bothGraphs.pullRequestGraph));
-      for (let name of Object.keys(bothGraphs.baselineGraph)) {
+      if (!fullGraph.baselineGraph) {
+        throw new Error("'added' only works when querying the diff between 2 graphs")
+      }
+      const newNames = new Set(Object.keys(fullGraph.graph));
+      for (let name of Object.keys(fullGraph.baselineGraph)) {
         newNames.delete(name);
       }
       return Array.from(newNames)
         .map((name) => graph[name])
         .filter(Boolean);
     case "REMOVED":
-      const oldNames = new Set(Object.keys(bothGraphs.baselineGraph));
-      for (let name of Object.keys(bothGraphs.pullRequestGraph)) {
+      if (!fullGraph.baselineGraph) {
+        throw new Error("'removed' only works when querying the diff between 2 graphs")
+      }
+      const oldNames = new Set(Object.keys(fullGraph.baselineGraph));
+      for (let name of Object.keys(fullGraph.graph)) {
         // console.log("remove", name);
         oldNames.delete(name);
       }
@@ -128,13 +134,16 @@ const applyQuery = (
         .map((name) => graph[name])
         .filter(Boolean);
     case "CHANGED":
+      if (!fullGraph.baselineGraph) {
+        throw new Error("'changed' only works when querying the diff between 2 graphs")
+      }
       return Object.keys(graph)
         .filter(
           (nodeName) =>
-            bothGraphs.pullRequestGraph[nodeName] === undefined ||
-            bothGraphs.baselineGraph[nodeName] === undefined ||
-            bothGraphs.pullRequestGraph[nodeName].size !=
-              bothGraphs.baselineGraph[nodeName].size,
+            fullGraph.graph[nodeName] === undefined ||
+            fullGraph.baselineGraph![nodeName] === undefined ||
+            fullGraph.graph[nodeName].size !=
+            fullGraph.baselineGraph![nodeName].size,
         )
         .map((key) => graph[key]);
     case "INTERPOLATE":
@@ -142,7 +151,7 @@ const applyQuery = (
         console.log("starting interpolation");
         console.log("running inner query");
         const queryToInterpolateResults = applyQuery(
-          bothGraphs,
+          fullGraph,
           graph,
           query.innerQuery,
         );
@@ -209,7 +218,7 @@ const applyQuery = (
       })();
     case "NOT":
       const notQueryInnerResultNames = new Set<string>(
-        applyQuery(bothGraphs, graph, query.innerQuery).map((x) => x.name),
+        applyQuery(fullGraph, graph, query.innerQuery).map((x) => x.name),
       );
       return Object.values(graph).filter(
         (node) => !notQueryInnerResultNames.has(node.name),
@@ -218,34 +227,38 @@ const applyQuery = (
 };
 
 export class QueryExecutor {
-  private bundleData: BothBundleStats | undefined;
+  private bundleData: BundleStats | undefined;
 
-  setData(blob: BothBundleStats) {
+  setData(blob: BundleStats) {
     this.bundleData = blob;
   }
 
-  getData(): BothBundleStats {
+  getData(): BundleStats {
     if (!this.bundleData) {
       throw Error("bundle data fetched before it was initialized");
     }
     return this.bundleData;
   }
 
-  filter(query: Query): BothBundleStats {
+  filter(query: Query): BundleStats {
     if (this.bundleData === undefined) {
       throw new Error("query executed before bundle data initialized");
     }
 
     const toGraph = (data: ModuleGraphNode[]) =>
       Object.fromEntries(data.map((x) => [x.name, x]));
-    const queriedData: BothBundleStats = {
-      baselineGraph: toGraph(
+
+
+    let result: BundleStats = {
+      graph: toGraph(
+        applyQuery(this.bundleData, this.bundleData.graph, query),
+      ),
+    }
+    if (this.bundleData.baselineGraph) {
+      result.baselineGraph = toGraph(
         applyQuery(this.bundleData, this.bundleData.baselineGraph, query),
-      ),
-      pullRequestGraph: toGraph(
-        applyQuery(this.bundleData, this.bundleData.pullRequestGraph, query),
-      ),
-    };
-    return queriedData;
+      );
+    }
+    return result;
   }
 }

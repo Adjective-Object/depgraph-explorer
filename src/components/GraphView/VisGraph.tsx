@@ -20,6 +20,7 @@ const VisGraphLoadBar = ({ percent }: { percent: number }) => {
     </section>
   );
 };
+
 export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
   const containerRef = React.useRef<HTMLElement | null>(null);
   const configContainerRef = React.useRef<HTMLElement | null>(null);
@@ -71,9 +72,9 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
         arrows: "to",
       },
     };
-    console.log("mount vis network", containerRef.current, options);
-    console.log("nodes:", graphData.nodes && graphData.nodes.length);
-    console.log("edges:", graphData.edges && graphData.edges.length);
+    // console.log("mount vis network", containerRef.current, options, graphData);
+    // console.log("nodes:", graphData.nodes && graphData.nodes.length);
+    // console.log("edges:", graphData.edges && graphData.edges.length);
 
     // clone graph data before passing it to `vis`, since `vis` takes
     // perpetual exclusive ownership of passed-in data exclusively
@@ -99,10 +100,9 @@ export const VisGraph = ({ graphData }: { graphData: vis.Data | null }) => {
   return (
     <>
       <section className="VisGraph-vis-graph" ref={containerRef} />
-      <button className="VisGraph-config-toggle" onClick={setIsConfigOpen}>
+      <ToggleArrow isClosed={!isConfigOpen} className="VisGraph-config-toggle" onClick={setIsConfigOpen}>
         graph config
-        <ToggleArrow isClosed={!isConfigOpen} />
-      </button>
+      </ToggleArrow>
       <section
         className={classNames("VisGraph-config-container", {
           "VisGraph-open": isConfigOpen,

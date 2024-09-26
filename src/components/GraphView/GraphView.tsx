@@ -100,8 +100,8 @@ const GraphView = () => {
       store.query.lastSucessfulCompilation !== null,
     numNodes: Number(
       isQuerySuccess(store.query.queryResult) &&
-        store.query.queryResult.data.nodes &&
-        store.query.queryResult.data.nodes.length,
+      store.query.queryResult.data.nodes &&
+      store.query.queryResult.data.nodes.length,
     ),
     shouldShowReasonEdges: store.graphOptions.shouldShowReasonEdges,
     queryResult: store.query.queryResult,

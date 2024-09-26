@@ -33,6 +33,15 @@ export const bundleDataReducer = withDefault(
           type: "INITIALIZING",
         };
         return data;
+      case "SET_BUNDLE_DATA_BLOB":
+        data.bundleSource = {
+          type: "SINGLE_BLOB",
+          blob: action.blob,
+        };
+        data.initializationState = {
+          type: "INITIALIZING",
+        };
+        return data;
       case "MARK_BUNDLE_DATA_ERROR":
         data.initializationState = {
           type: "INITIALIZATION_FAILURE",
